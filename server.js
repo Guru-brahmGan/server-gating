@@ -52,8 +52,20 @@ app.post('/generateSignature', (req, res) => {
 
 app.post('/registerMachine', async (req, res) => {
     const machineData = req.body;
+    const walletAddress = req.body.walletAddress;
+
+    if (!walletAddress) {
+        return res.status(400).json({ error: 'Wallet address is required.' });
+    }
 
     try {
+
+        const isUserRegistered = await gpuMarketplaceContract.isRegistered(walletAddress);
+        
+        if (!isUserRegistered) {
+            return res.status(400).json({ error: 'Wallet address is not a registered user.' });
+        }
+        
         const tx = await gpuMarketplaceContract.registerMachines(
             machineData.cpuname,
             machineData.gpuname,
