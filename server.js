@@ -1,9 +1,20 @@
 const express = require('express');
 const { ethers } = require("ethers");
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose');
+const Order = require('./order');
 
 const app =  express();
 const port = 3000;
+
+mongoose.connect('mongodb+srv://mani:bBQyDZekv35y88eD@gpunet.35quzds.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
+
+const db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log('Connected to MongoDB');
+});
 
 const provider = new ethers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/c426541689964368a260a33d25bc7772`);
 console.log(provider);
@@ -63,6 +74,61 @@ app.get('/isAUser', async (req,res) => {
     })
 })
 
+app.post('/rentMachine', async (req, res) => {
+    const orderData = req.body;
+    const orderId = orderData.orderId;
+
+    // Fetch order details from the Ethereum smart contract
+    const orderDetails = await getOrderDetails(orderId);
+    
+    if (!orderDetails) {
+        return res.status(400).json({ error: 'Order details not found or invalid.' });
+    }
+
+    // Verify the order details, ensuring they match the request
+    if (!verifyOrderDetails(orderDetails, orderData)) {
+        return res.status(400).json({ error: 'Invalid order details.' });
+    }
+
+    const order = new Order({
+        orderId:  orderData.orderId,
+        machineId: orderData.machineId,
+        providerId: orderData.provider,
+        renterId: orderData.renter,
+        renterUsername: orderData.renterName,
+        gPointsPaid: orderData.gPointsValue,
+        hoursRented: orderData.duration,
+    });
+    console.log('Sending oder details')
+    await order.save();
+    console.log('details stored')
+    res.send('Stored successfully')
+
+})
+
+async function getOrderDetails(orderId) {
+    try {
+        // Use the Ethereum contract function to fetch order details
+        // Replace this with the actual function in your smart contract to get order details
+        const orderDetails = await gpuMarketplaceContract.orders(orderId);
+        return orderDetails;
+    } catch (error) {
+        console.error('Error fetching order details from the smart contract:', error);
+        return null;
+    }
+}
+
+function verifyOrderDetails(orderDetails, orderData) {
+    // Adding the verification logic here to ensure that order details match the request
+    if (orderDetails.machineId !== orderData.machineId ||
+        orderDetails.renterId !== orderData.renter ||
+        orderDetails.gPointsValue !== orderData.gPointsValue ||
+        orderDetails.duration !== orderData.duration) {
+        return false;
+    }
+
+    return true;
+}
 
 app.post('/registerMachine', async (req, res) => {
     const machineData = req.body;
