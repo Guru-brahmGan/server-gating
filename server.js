@@ -31,7 +31,7 @@ const connectedWallet = wallet.connect(provider);
 const gpuMarketplaceABI = require('./gpuMarketplaceABI.json');
 
 // Address of the deployed gpuMarketplace contract
-const gpuMarketplaceAddress = '0x443E65Ead70aA0A6f38FF73a9a4Ef22CD68A9d41';
+const gpuMarketplaceAddress = '0xb937659FAd15E55E24BBC159A7f7D4D6Ce8cfb2B';
 
 const gpuMarketplaceContract = new ethers.Contract(gpuMarketplaceAddress, gpuMarketplaceABI, connectedWallet);
 
@@ -74,61 +74,108 @@ app.get('/isAUser', async (req,res) => {
     })
 })
 
-app.post('/rentMachine', async (req, res) => {
-    const orderData = req.body;
-    const orderId = orderData.orderId;
+// app.post('/rentMachine', async (req, res) => {
+//     const orderDetails = req.body;
 
-    // Fetch order details from the Ethereum smart contract
-    const orderDetails = await getOrderDetails(orderId);
+//     // Fetch order details from the Ethereum smart contract
+//     // const orderDetails = await getOrderDetails(orderId);
     
-    if (!orderDetails) {
-        return res.status(400).json({ error: 'Order details not found or invalid.' });
-    }
+//     // if (!orderDetails) {
+//     //     return res.status(400).json({ error: 'Order details not found or invalid.' });
+//     // }
 
-    // Verify the order details, ensuring they match the request
-    if (!verifyOrderDetails(orderDetails, orderData)) {
-        return res.status(400).json({ error: 'Invalid order details.' });
-    }
+//     // Verify the order details, ensuring they match the request
+//     if (!verifyOrderDetails(orderDetails, orderData)) {
+//         return res.status(400).json({ error: 'Invalid order details.' });
+//     }
 
-    const order = new Order({
-        orderId:  orderData.orderId,
-        machineId: orderData.machineId,
-        providerId: orderData.provider,
-        renterId: orderData.renter,
-        renterUsername: orderData.renterName,
-        gPointsPaid: orderData.gPointsValue,
-        hoursRented: orderData.duration,
-    });
-    console.log('Sending oder details')
-    await order.save();
-    console.log('details stored')
-    res.send('Stored successfully')
+//     try {
 
-})
+//         const tx = await gpuMarketplaceContract.registerMachines(
+//             orderDetails.machineid,
+//             orderDetails.duration,
+//             orderDetails.userUID
+//         );
 
-async function getOrderDetails(orderId) {
+//         // const order = new Order({
+//         //     orderId:  orderData.orderId,
+//         //     machineId: orderData.machineId,
+//         //     providerId: orderData.provider,
+//         //     renterId: orderData.renter,
+//         //     renterUsername: orderData.renterName,
+//         //     gPointsPaid: orderData.gPointsValue,
+//         //     hoursRented: orderData.duration,
+//         // });
+//         console.log('Sending oder details')
+//         // await order.save();
+//         console.log('details stored')
+//         res.send('Stored successfully')
+//         const receipt = await tx.wait();
+            
+//         console.log(receipt);
+
+//         res.json({
+//             success: true,
+//             transactionHash: receipt.transactionHash
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             success: false,
+//             message: error.message
+//         });
+
+// })
+
+app.post('/rentMachine', async (req, res) => {
     try {
-        // Use the Ethereum contract function to fetch order details
-        // Replace this with the actual function in your smart contract to get order details
-        const orderDetails = await gpuMarketplaceContract.orders(orderId);
-        return orderDetails;
+        // Extract required information from the request body
+        const machineId = req.body.machineId;
+        const rentalDuration = req.body.rentalDuration;
+        const userId = req.body.userId; 
+
+        // Call the rentMachine function in smart contract and get the orderId
+        const order = await gpuMarketplaceContract.rentMachine(machineId, rentalDuration, userId);
+        // const orderId = await gpuMarketplaceContract.orderId();
+        // console.log(orderId);
+        // Respond with the orderId
+        res.json({ success: true, message: 'Machine rented successfully', SSH_Keys: "s23ghy4u2y3u2y4y32uy3u2y4gu3y24u"});
     } catch (error) {
-        console.error('Error fetching order details from the smart contract:', error);
-        return null;
+        console.error('Error renting a machine:', error);
+        res.status(500).json({ success: false, message: 'Failed to rent the machine', error: error.message });
     }
-}
+});
 
-function verifyOrderDetails(orderDetails, orderData) {
-    // Adding the verification logic here to ensure that order details match the request
-    if (orderDetails.machineId !== orderData.machineId ||
-        orderDetails.renterId !== orderData.renter ||
-        orderDetails.gPointsValue !== orderData.gPointsValue ||
-        orderDetails.duration !== orderData.duration) {
-        return false;
-    }
+// async function getOrderDetails(orderId) {
+//     try {
+//         // Use the Ethereum contract function to fetch order details
+//         // Replace this with the actual function in your smart contract to get order details
+//         const orderDetails = await gpuMarketplaceContract.orders(orderId);
+//         return orderDetails;
+//     } catch (error) {
+//         console.error('Error fetching order details from the smart contract:', error);
+//         return null;
+//     }
+// }
 
-    return true;
-}
+// function verifyOrderDetails(orderDetails, orderData) {
+//     // Adding the verification logic here to ensure that order details match the request
+//     if (orderDetails.machineId !== orderData.machineId ||
+//         orderDetails.renterId !== orderData.renter ||
+//         orderDetails.gPointsValue !== orderData.gPointsValue ||
+//         orderDetails.duration !== orderData.duration) {
+//         return false;
+//     }
+
+//     return true;
+// }
+
+app.get('/getMachineDetails', async (req, res) => {
+    const machineDetails = await gpuMarketplaceContract.machines(10001);
+    console.log(machineDetails)
+    res.json({
+        "cpuName": machineDetails.cpuName 
+    })
+})
 
 app.post('/registerMachine', async (req, res) => {
     const machineData = req.body;
