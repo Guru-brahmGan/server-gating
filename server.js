@@ -7,14 +7,14 @@ const Order = require('./order');
 const app =  express();
 const port = 3000;
 
-mongoose.connect('mongodb+srv://mani:bBQyDZekv35y88eD@gpunet.35quzds.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
+// mongoose.connect('mongodb+srv://mani:bBQyDZekv35y88eD@gpunet.35quzds.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
 
-const db = mongoose.connection;
+// const db = mongoose.connection;
 
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
-});
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// db.once('open', () => {
+//     console.log('Connected to MongoDB');
+// });
 
 const provider = new ethers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/c426541689964368a260a33d25bc7772`);
 console.log(provider);
