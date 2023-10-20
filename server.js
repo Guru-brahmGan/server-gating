@@ -2,19 +2,23 @@ const express = require('express');
 const { ethers } = require("ethers");
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
-const Order = require('./order');
+
+const Order = require('./Schemas/order');
+const MachineRented = require('./Schemas/machineRented')
+const MachineListed = require('./Schemas/machineListed')
+const gPointsUpdate = require('./Schemas/gPointsUpdate')
 
 const app =  express();
 const port = 3000;
 
-// mongoose.connect('mongodb+srv://mani:bBQyDZekv35y88eD@gpunet.35quzds.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost:27017/gpuNet', { useNewUrlParser: true, useUnifiedTopology: true });
 
-// const db = mongoose.connection;
+const db = mongoose.connection;
 
-// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-// db.once('open', () => {
-//     console.log('Connected to MongoDB');
-// });
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log('Connected to MongoDB');
+});
 
 const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/c426541689964368a260a33d25bc7772`);
 
@@ -46,8 +50,16 @@ gpuMarketplaceContractWS.on("MachineListed", (_machineId, _name) => {
         "name":_name
     }
     
-    console.log(info)
+    const newMachineListed = new MachineListed(info);
     
+    newMachineListed.save()
+    .then(() => {
+        console.log('New MachineListed Event Added!');
+    })
+    .catch(error => {
+        console.error('Error adding data to MachineListed Event',error);
+    });    
+
 });
 
 
@@ -59,8 +71,16 @@ gpuMarketplaceContractWS.on("MachineRented", (_orderId, _machineId, _renter) => 
         "renter":_renter
     }
     
-    console.log(info)
+    const newMachineRented = new MachineRented(info);
     
+    newMachineRented.save()
+    .then(() => {
+        console.log('New MachineRented Event Added!');
+    })
+    .catch(error => {
+        console.error('Error adding data to MachineRented Event',error);
+    });  
+
 });
 
 gpuMarketplaceContractWS.on("gPointsUpdate", (_user, _amount, _orderType) => {
@@ -71,8 +91,16 @@ gpuMarketplaceContractWS.on("gPointsUpdate", (_user, _amount, _orderType) => {
         "orderType":_orderType
     }
     
-    console.log(info)
+    const newgPointsUpdate = new gPointsUpdate(info);
     
+    newgPointsUpdate.save()
+    .then(() => {
+        console.log('New gPointsUpdate Event Added!');
+    })
+    .catch(error => {
+        console.error('Error adding data to gPointsUpdate Event',error);
+    });    
+
 });
 
 app.get('/getBlock', async (req, res) => {

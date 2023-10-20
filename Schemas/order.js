@@ -8,7 +8,9 @@ const orderSchema = new mongoose.Schema({
     renterUsername: String,
     gPointsPaid: Number,
     hoursRented: Number,
-});
+    },
+    { collection: 'Order', versionKey: false }
+);
 
 const Order = mongoose.model('Order', orderSchema);
 
