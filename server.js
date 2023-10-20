@@ -16,8 +16,9 @@ const port = 3000;
 //     console.log('Connected to MongoDB');
 // });
 
-const provider = new ethers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/c426541689964368a260a33d25bc7772`);
-console.log(provider);
+const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/c426541689964368a260a33d25bc7772`);
+
+const websocketProvider = new ethers.providers.WebSocketProvider(`wss://polygon-mumbai.infura.io/ws/v3/c426541689964368a260a33d25bc7772`);
 
 const SERVER_PRIVATE_KEY = "b76c042ef1476b7d8bbfa75290f270c943aae819053a3ba3334bd621d0034b6b"; 
 
@@ -26,6 +27,8 @@ const wallet = new ethers.Wallet(SERVER_PRIVATE_KEY);
 app.use(bodyParser.json());
 
 const connectedWallet = wallet.connect(provider);
+const connectedWalletWS = wallet.connect(websocketProvider);
+
 
 // ABI for the gpuMarketplace contract
 const gpuMarketplaceABI = require('./gpuMarketplaceABI.json');
@@ -34,6 +37,43 @@ const gpuMarketplaceABI = require('./gpuMarketplaceABI.json');
 const gpuMarketplaceAddress = '0xb937659FAd15E55E24BBC159A7f7D4D6Ce8cfb2B';
 
 const gpuMarketplaceContract = new ethers.Contract(gpuMarketplaceAddress, gpuMarketplaceABI, connectedWallet);
+const gpuMarketplaceContractWS = new ethers.Contract(gpuMarketplaceAddress, gpuMarketplaceABI, connectedWalletWS);
+
+gpuMarketplaceContractWS.on("MachineListed", (_machineId, _name) => {
+
+    const info = {
+        "machineId":_machineId,
+        "name":_name
+    }
+    
+    console.log(info)
+    
+});
+
+
+gpuMarketplaceContractWS.on("MachineRented", (_orderId, _machineId, _renter) => {
+
+    const info = {
+        "orderId":_orderId,
+        "machineId":_machineId,
+        "renter":_renter
+    }
+    
+    console.log(info)
+    
+});
+
+gpuMarketplaceContractWS.on("gPointsUpdate", (_user, _amount, _orderType) => {
+
+    const info = {
+        "user":_user,
+        "amount":_amount,
+        "orderType":_orderType
+    }
+    
+    console.log(info)
+    
+});
 
 app.get('/getBlock', async (req, res) => {
     const currentBlock = await provider.getBlockNumber();
