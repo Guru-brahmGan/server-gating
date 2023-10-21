@@ -7,6 +7,7 @@ const Order = require('./Schemas/order');
 const MachineRented = require('./Schemas/machineRented')
 const MachineListed = require('./Schemas/machineListed')
 const gPointsUpdate = require('./Schemas/gPointsUpdate')
+const RegisterMachine = require('./Schemas/registerMachine')
 
 const app =  express();
 const port = 3000;
@@ -278,6 +279,30 @@ app.post('/registerMachine', async (req, res) => {
         const receipt = await tx.wait();
         
         console.log(receipt.transactionHash);
+
+        const info = {
+            "cpuname":machineData.cpuname,
+            "gpuname":machineData.gpuname,
+            "spuVRam":machineData.spuVRam,
+            "totalRam":machineData.totalRam,
+            "memorySize":machineData.memorySize,
+            "coreCount":machineData.coreCount,
+            "ipAddr":machineData.ipAddr,
+            "openedPorts":machineData.openedPorts,
+            "region":machineData.region,
+            "bidprice":machineData.bidprice,
+            "walletAddress":machineData.walletAddress
+        }
+
+        const newRegisterMachine = new RegisterMachine(info);
+    
+        newRegisterMachine.save()
+        .then(() => {
+            console.log('New Machine Added!');
+        })
+        .catch(error => {
+            console.error('Error adding new Machine',error);
+        });   
 
         res.json({
             success: true,
