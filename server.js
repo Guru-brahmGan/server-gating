@@ -2,22 +2,28 @@ const express = require('express');
 const { ethers } = require("ethers");
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
-const Order = require('./order');
+
+const Order = require('./Schemas/order');
+const MachineRented = require('./Schemas/machineRented')
+const MachineListed = require('./Schemas/machineListed')
+const gPointsUpdate = require('./Schemas/gPointsUpdate')
+const RegisterMachine = require('./Schemas/registerMachine')
 
 const app =  express();
 const port = 3000;
 
-// mongoose.connect('mongodb+srv://mani:bBQyDZekv35y88eD@gpunet.35quzds.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost:27017/gpuNet', { useNewUrlParser: true, useUnifiedTopology: true });
 
-// const db = mongoose.connection;
+const db = mongoose.connection;
 
-// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-// db.once('open', () => {
-//     console.log('Connected to MongoDB');
-// });
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log('Connected to MongoDB');
+});
 
-const provider = new ethers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/c426541689964368a260a33d25bc7772`);
-console.log(provider);
+const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/c426541689964368a260a33d25bc7772`);
+
+const websocketProvider = new ethers.providers.WebSocketProvider(`wss://polygon-mumbai.infura.io/ws/v3/c426541689964368a260a33d25bc7772`);
 
 const SERVER_PRIVATE_KEY = "b76c042ef1476b7d8bbfa75290f270c943aae819053a3ba3334bd621d0034b6b"; 
 
@@ -26,6 +32,8 @@ const wallet = new ethers.Wallet(SERVER_PRIVATE_KEY);
 app.use(bodyParser.json());
 
 const connectedWallet = wallet.connect(provider);
+const connectedWalletWS = wallet.connect(websocketProvider);
+
 
 // ABI for the gpuMarketplace contract
 const gpuMarketplaceABI = require('./gpuMarketplaceABI.json');
@@ -34,6 +42,67 @@ const gpuMarketplaceABI = require('./gpuMarketplaceABI.json');
 const gpuMarketplaceAddress = '0xb937659FAd15E55E24BBC159A7f7D4D6Ce8cfb2B';
 
 const gpuMarketplaceContract = new ethers.Contract(gpuMarketplaceAddress, gpuMarketplaceABI, connectedWallet);
+const gpuMarketplaceContractWS = new ethers.Contract(gpuMarketplaceAddress, gpuMarketplaceABI, connectedWalletWS);
+
+gpuMarketplaceContractWS.on("MachineListed", (_machineId, _name) => {
+
+    const info = {
+        "machineId":_machineId,
+        "name":_name
+    }
+    
+    const newMachineListed = new MachineListed(info);
+    
+    newMachineListed.save()
+    .then(() => {
+        console.log('New MachineListed Event Added!');
+    })
+    .catch(error => {
+        console.error('Error adding data to MachineListed Event',error);
+    });    
+
+});
+
+
+gpuMarketplaceContractWS.on("MachineRented", (_orderId, _machineId, _renter) => {
+
+    const info = {
+        "orderId":_orderId,
+        "machineId":_machineId,
+        "renter":_renter
+    }
+    
+    const newMachineRented = new MachineRented(info);
+    
+    newMachineRented.save()
+    .then(() => {
+        console.log('New MachineRented Event Added!');
+    })
+    .catch(error => {
+        console.error('Error adding data to MachineRented Event',error);
+    });  
+
+});
+
+gpuMarketplaceContractWS.on("gPointsUpdate", (_user, _amount, _orderType) => {
+
+    const info = {
+        "user":_user,
+        "amount":_amount,
+        "orderType":_orderType
+    }
+    
+    const newgPointsUpdate = new gPointsUpdate(info);
+    
+    newgPointsUpdate.save()
+    .then(() => {
+        console.log('New gPointsUpdate Event Added!');
+    })
+    .catch(error => {
+        console.error('Error adding data to gPointsUpdate Event',error);
+    });    
+
+});
 
 app.get('/getBlock', async (req, res) => {
     const currentBlock = await provider.getBlockNumber();
@@ -210,6 +279,30 @@ app.post('/registerMachine', async (req, res) => {
         const receipt = await tx.wait();
         
         console.log(receipt.transactionHash);
+
+        const info = {
+            "cpuname":machineData.cpuname,
+            "gpuname":machineData.gpuname,
+            "spuVRam":machineData.spuVRam,
+            "totalRam":machineData.totalRam,
+            "memorySize":machineData.memorySize,
+            "coreCount":machineData.coreCount,
+            "ipAddr":machineData.ipAddr,
+            "openedPorts":machineData.openedPorts,
+            "region":machineData.region,
+            "bidprice":machineData.bidprice,
+            "walletAddress":machineData.walletAddress
+        }
+
+        const newRegisterMachine = new RegisterMachine(info);
+    
+        newRegisterMachine.save()
+        .then(() => {
+            console.log('New Machine Added!');
+        })
+        .catch(error => {
+            console.error('Error adding new Machine',error);
+        });   
 
         res.json({
             success: true,
