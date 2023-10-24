@@ -113,29 +113,30 @@ app.get('/getBlock', async (req, res) => {
     console.log(currentBlock);
 })
 
-// app.get('/generateSignature', (req, res) => {
-//     // Extract the wallet address from the request body
-//     const walletAddress = '0x8CDCe246A852cee0Ad89D0B9A0B29415f1D89D9A';
+app.post('/generateSignature', async(req, res) => {
 
-//     // Check if the wallet address is provided
-//     if (!walletAddress) {
-//         return res.status(400).json({ error: 'Wallet address is required.' });
-//     }
+    // Extract the wallet address from the request body
+    const walletAddress = req.body.walletAddress;
 
-//     // Generate the message to be signed: wallet address + current timestamp
-//     const message = `${walletAddress}:${Date.now()}`;
+    // Check if the wallet address is provided
+    if (!walletAddress) {
+        return res.status(400).json({ error: 'Wallet address is required.' });
+    }
 
-//     // Calculate message hash
-//     const mesHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(message));
+    // Generate the message to be signed: wallet address + current timestamp
+    const message = `${walletAddress}:${Date.now()}`;
 
-//     // Sign the message hash
-//     const sigHash = wallet.signMessage(ethers.utils.arrayify(mesHash));
+    // Calculate message hash
+    const mesHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(message));
 
-//     res.json({
-//         mesHash: mesHash,
-//         sigHash: sigHash
-//     });
-// });
+    // Sign the message hash
+    const sigHash = await wallet.signMessage(ethers.utils.arrayify(mesHash));
+
+    res.json({
+        mesHash: mesHash,
+        sigHash: sigHash
+    });
+});
 
 app.get('/isAUser', async (req,res) => {
     const userBool = await gpuMarketplaceContract.isRegistered('0x8CDCe246A852cee0Ad89D0B9A0B29415f1D89D9A');
