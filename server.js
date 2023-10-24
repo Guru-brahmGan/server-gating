@@ -165,8 +165,9 @@ app.post('/registerUser', async(req, res) => {
 
 });
 
-app.get('/isAUser', async (req,res) => {
-    const userBool = await gpuMarketplaceContract.isRegistered('0x8CDCe246A852cee0Ad89D0B9A0B29415f1D89D9A');
+app.post('/isAUser', async (req,res) => {
+    const walletAddress = req.body.walletAddress;
+    const userBool = await gpuMarketplaceContract.isRegistered(walletAddress);
     res.json ( {
         userBool : userBool
     })
@@ -298,8 +299,9 @@ app.post('/rentMachine', async (req, res) => {
 //     return true;
 // }
 
-app.get('/getMachineDetails', async (req, res) => {
-    const machineDetails = await gpuMarketplaceContract.machines(10001);
+app.post('/getMachineDetails', async (req, res) => {
+    const machineId = req.body.machineId;
+    const machineDetails = await gpuMarketplaceContract.machines(machineId);
     console.log(machineDetails)
     res.json({
         "cpuName": machineDetails.cpuName 
