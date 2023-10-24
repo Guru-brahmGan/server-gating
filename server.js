@@ -2,6 +2,7 @@ const express = require('express');
 const { ethers } = require("ethers");
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
+const axios = require('axios');
 
 const Order = require('./Schemas/order');
 const MachineRented = require('./Schemas/machineRented')
@@ -12,7 +13,7 @@ const RegisterMachine = require('./Schemas/registerMachine')
 const app =  express();
 const port = 3000;
 
-mongoose.connect('mongodb://localhost:27017/gpuNet', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb+srv://mani:bBQyDZekv35y88eD@gpunet.35quzds.mongodb.net/', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const db = mongoose.connection;
 
@@ -207,7 +208,38 @@ app.post('/rentMachine', async (req, res) => {
         // const orderId = await gpuMarketplaceContract.orderId();
         // console.log(orderId);
         // Respond with the orderId
-        res.json({ success: true, message: 'Machine rented successfully', SSH_Keys: "s23ghy4u2y3u2y4y32uy3u2y4gu3y24u"});
+        // Calculate the timestamp when SSH access should be revoked
+        const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
+        const revokeTime = currentTime + (rentalDuration * 3600); // Convert hours to seconds
+
+        // Initiate SSH access by calling the external endpoint
+        const initSSHResponse = await axios.post('http://3.220.122.237:8080/init_ssh', {});
+            // orderId: order, // Pass the orderId to identify the machine
+            // revokeTime: revokeTime, // Pass the revoke time to set the timeout
+        
+
+        // Respond with the orderId and the response from the SSH initialization endpoint
+        res.json({
+            success: true,
+            message: 'Machine rented successfully',
+            orderId: order,
+            SSHInitiationResponse: initSSHResponse.data, // Include the response from SSH initiation
+        });
+
+        // Set a timeout to automatically call the revoke SSH access endpoint
+        const timeoutInMilliseconds = rentalDuration * 3600 * 1000; // Convert hours to milliseconds
+        setTimeout(async () => {
+            try {
+                // Call the revoke SSH access endpoint
+                const revokeSSHResponse = await axios.post('http://3.220.122.237:8080/revoke_ssh', {
+                });
+                // orderId: order, // Pass the orderId to identify the machine
+                console.log('SSH access revoked:', revokeSSHResponse.data);
+            } catch (error) {
+                console.error('Error revoking SSH access:', error.message);
+            }
+        }, timeoutInMilliseconds);
+
     } catch (error) {
         console.error('Error renting a machine:', error);
         res.status(500).json({ success: false, message: 'Failed to rent the machine', error: error.message });
