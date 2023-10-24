@@ -138,6 +138,33 @@ app.post('/generateSignature', async(req, res) => {
     });
 });
 
+app.post('/registerUser', async(req, res) => {
+
+    try{
+
+        // Extract info from the request body
+        const name = req.body.name;
+        const referrerId = req.body.referrerId;
+        const signature = req.body.signature
+        const messageHash = req.body.messageHash
+        const userAddress = req.body.userAddress
+
+        // Check if the everything is provided
+        if (!name && !referrerId && !signature && !messageHash && !userAddress) {
+            return res.status(400).json({ error: 'Not all the required details are provided.' });
+        }
+
+        const register = await gpuMarketplaceContract.registerUser(name, referrerId, signature, messageHash, userAddress);
+
+        res.json({ success: true, message: 'Registered user successfully'});
+
+    }catch(e){
+        console.error('Error registering user:', error);
+        res.status(500).json({ success: false, message: 'Failed to register user', error: error.message });
+    }
+
+});
+
 app.get('/isAUser', async (req,res) => {
     const userBool = await gpuMarketplaceContract.isRegistered('0x8CDCe246A852cee0Ad89D0B9A0B29415f1D89D9A');
     res.json ( {
