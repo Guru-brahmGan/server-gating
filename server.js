@@ -322,6 +322,30 @@ app.get('/availableMachines', async (req, res) => {
         }
 
     }catch(e){
+        console.log(e)
+        res.json({success: false, message: 'Something went wrong.'})
+    }
+
+});
+
+app.post('/userOrders', async(req,res) => {
+
+    try{
+
+        const walletAddress = req.body.walletAddress
+
+        if (!walletAddress) {
+            return res.status(400).json({ error: 'Wallet address is required.' });
+        }
+
+        const info = await Order.find({
+            "renterId":walletAddress
+        })
+
+        res.json({ success: true, message: info});
+
+    }catch(e){
+        console.log(e)
         res.json({success: false, message: 'Something went wrong.'})
     }
 
