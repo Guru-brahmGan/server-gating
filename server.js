@@ -328,6 +328,61 @@ app.get('/availableMachines', async (req, res) => {
 
 });
 
+app.get('/topGpointHolders', async (req,res) => {
+
+    try{
+
+        const userCount = await gpuMarketplaceContract.userIdCount();
+        const totalUsers = userCount-100
+
+        let loopCount = 0 
+        let referrerId = 100001
+
+        let registeredWallets = []
+        let walletGpoints = []
+        let referrerContractCall = []
+
+        while(loopCount<totalUsers){
+            referrerContractCall.push(gpuMarketplaceContract.refCodeToUser(referrerId))
+            referrerId++
+            loopCount++
+        }
+
+        let responses = await Promise.all(referrerContractCall);
+        for(const response of responses){
+            registeredWallets.push(response)
+        }
+
+        let gPointContractCall = []
+        for(const wallet of registeredWallets){
+            gPointContractCall.push(gpuMarketplaceContract.getUserGPoints(wallet))
+        }
+
+        responses = await Promise.all(gPointContractCall);
+
+        for(const i in responses){
+            walletGpoints.push({
+                "wallet":registeredWallets[i],
+                "gPoint":parseInt(responses[i])
+            })
+        }
+
+        walletGpoints.sort(function(first, second) {
+            return second.gPoint - first.gPoint;
+        });
+
+        res.json({
+            success:true,
+            message:walletGpoints.slice(0,10)
+        })
+
+    }catch(e){
+        console.log(e)
+        res.json({success: false, message: 'Something went wrong.'})
+    }
+
+});
+
 app.post('/userOrders', async(req,res) => {
 
     try{
