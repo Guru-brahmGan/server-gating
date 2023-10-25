@@ -284,12 +284,18 @@ app.get('/availableMachines', async (req, res) => {
 
         if(maxMachineId>10000){
 
+            const allContractCall = [];
             let currentMachineId = 10001 
 
             while(maxMachineId>=currentMachineId){
+                allContractCall.push(gpuMarketplaceContract.machines(currentMachineId))
+                currentMachineId++
+            }
 
-                const machineInfo = await gpuMarketplaceContract.machines(currentMachineId);
-                
+            var responses = await Promise.all(allContractCall);
+
+            for(const machineInfo of responses){
+
                 const info = {
                     cpuName:machineInfo.cpuName,
                     gpuName:machineInfo.gpuName,
@@ -306,9 +312,9 @@ app.get('/availableMachines', async (req, res) => {
                 }
                 
                 allMachines.push(info)
-                currentMachineId++
-            
+
             }
+
             res.json({
                 success:true,
                 message:allMachines
