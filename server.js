@@ -277,37 +277,46 @@ app.post('/rentMachine', async (req, res) => {
 
 app.get('/availableMachines', async (req, res) => {
 
-    const maxMachineId = parseInt(await gpuMarketplaceContract.machineId());
-    let allMachines = []
+    try{
 
-    if(maxMachineId>10000){
+        const maxMachineId = parseInt(await gpuMarketplaceContract.machineId());
+        let allMachines = []
 
-        let currentMachineId = 10001 
+        if(maxMachineId>10000){
 
-        while(maxMachineId>=currentMachineId){
+            let currentMachineId = 10001 
 
-            const machineInfo = await gpuMarketplaceContract.machines(currentMachineId);
+            while(maxMachineId>=currentMachineId){
+
+                const machineInfo = await gpuMarketplaceContract.machines(currentMachineId);
+                
+                const info = {
+                    cpuName:machineInfo.cpuName,
+                    gpuName:machineInfo.gpuName,
+                    gpuVRAM:parseInt(machineInfo.gpuVRAM),
+                    totalRAM:parseInt(machineInfo.totalRAM),
+                    storageAvailable:parseInt(machineInfo.storageAvailable),
+                    coreCount:parseInt(machineInfo.coreCount),
+                    IPAddress:machineInfo.IPAddress,
+                    portsOpen:machineInfo.portsOpen,
+                    region:machineInfo.region,
+                    bidPrice:parseInt(machineInfo.bidPrice),
+                    isAvailable:machineInfo.isAvailable,
+                    isListed:machineInfo.isListed,
+                }
+                
+                allMachines.push(info)
+                currentMachineId++
             
-            const info = {
-                cpuName:machineInfo.cpuName,
-                gpuName:machineInfo.gpuName,
-                gpuVRAM:parseInt(machineInfo.gpuVRAM),
-                totalRAM:parseInt(machineInfo.totalRAM),
-                storageAvailable:parseInt(machineInfo.storageAvailable),
-                coreCount:parseInt(machineInfo.coreCount),
-                IPAddress:machineInfo.IPAddress,
-                portsOpen:machineInfo.portsOpen,
-                region:machineInfo.region,
-                bidPrice:parseInt(machineInfo.bidPrice),
-                isAvailable:machineInfo.isAvailable,
-                isListed:machineInfo.isListed,
             }
-            
-            allMachines.push(info)
-            currentMachineId++
-        
+            res.json({
+                success:true,
+                message:allMachines
+            })
         }
-        res.json(allMachines)
+
+    }catch(e){
+        res.json({success: false, message: 'Something went wrong.'})
     }
 
 });
