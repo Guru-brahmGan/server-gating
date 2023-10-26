@@ -336,19 +336,19 @@ app.get('/topGpointHolders', async (req,res) => {
         const totalUsers = userCount-100
 
         let loopCount = 0 
-        let referrerId = 100001
+        let userId = 101
 
         let registeredWallets = []
         let walletGpoints = []
-        let referrerContractCall = []
+        let  userContractCall = []
 
         while(loopCount<totalUsers){
-            referrerContractCall.push(gpuMarketplaceContract.refCodeToUser(referrerId))
-            referrerId++
+            userContractCall.push(gpuMarketplaceContract.UIDtoAddress(userId))
+            userId++
             loopCount++
         }
 
-        let responses = await Promise.all(referrerContractCall);
+        let responses = await Promise.all(userContractCall);
         for(const response of responses){
             registeredWallets.push(response)
         }
