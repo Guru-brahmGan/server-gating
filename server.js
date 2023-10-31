@@ -429,6 +429,37 @@ app.post("/userOrders", async (req, res) => {
   }
 });
 
+app.get("/getHome", async (req ,res) => {
+
+  try{
+    
+    const info = await Order.find({});
+    const orderCount = info.length
+    let totalHoursRented = 0
+    let totalGpointsPaid = 0
+
+    for(const order of info ){
+      totalHoursRented += order.hoursRented
+      totalGpointsPaid += order.gPointsPaid
+    }
+
+    const avgOrderValue = totalGpointsPaid/orderCount
+    const avgHoursRented = totalHoursRented/orderCount
+
+    const finalResponse = {
+      "avgOrderValue":avgOrderValue,
+      "avgHoursRented":avgHoursRented
+    }
+
+    res.json({ success: true, message: finalResponse });
+
+  }catch(e){
+    console.log(e)
+    res.json({ success: false, message: "Something went wrong." });
+  }
+
+})
+
 // async function getOrderDetails(orderId) {
 //     try {
 //         // Use the Ethereum contract function to fetch order details
