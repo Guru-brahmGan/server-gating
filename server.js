@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require('dotenv').config()
 
 const {gpuMarketplaceContractInstance, gpuMarketplaceContractWSInstance} = require('./Contract/contract.js')
 const {provider} = gpuMarketplaceContractInstance()
@@ -26,7 +27,7 @@ const app = express();
 const port = 3000;
 
 mongoose.connect(
-  "mongodb+srv://mani:bBQyDZekv35y88eD@gpunet.35quzds.mongodb.net/",
+  process.env.MONGO_URL,
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
 
