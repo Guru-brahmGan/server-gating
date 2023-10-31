@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema({
     orderId: Number,
     machineId: Number,
     providerId: String,
-    renterId: String,
+    renterId: Number,
     renterUsername: String,
     gPointsPaid: Number,
     hoursRented: Number,
