@@ -429,11 +429,17 @@ app.post("/userOrders", async (req, res) => {
   }
 });
 
-app.get("/getHome", async (req ,res) => {
+app.post("/getUserInfo", async (req ,res) => {
 
   try{
-    
-    const info = await Order.find({});
+
+    const providerId = req.body.providerId;
+
+    if (!providerId) {
+      return res.status(400).json({ error: "Provider ID is required." });
+    }
+
+    const info = await Order.find({"providerId":providerId});
     const orderCount = info.length
     let totalHoursRented = 0
     let totalGpointsPaid = 0
