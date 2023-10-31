@@ -30,8 +30,8 @@ const getUserInfo = async(req,res) => {
               machineListed++
           }
         }
-    
-        const info = await Order.find({"renterId":providerId});
+
+        const info = await Order.find({"renterId":UID});
         const orderCount = info.length
         let totalHoursRented = 0
         let totalGpointsPaid = 0
@@ -46,7 +46,8 @@ const getUserInfo = async(req,res) => {
     
         const finalResponse = {
           "avgOrderValue":avgOrderValue,
-          "avgHoursRented":avgHoursRented
+          "avgHoursRented":avgHoursRented,
+          "machineListed":machineListed
         }
     
         res.json({ success: true, message: finalResponse });
