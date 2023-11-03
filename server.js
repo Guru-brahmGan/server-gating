@@ -84,6 +84,7 @@ gpuMarketplaceContractWS.on("gPointsUpdate", (_user, _amount, _orderType) => {
     user: _user,
     amount: _amount,
     orderType: _orderType,
+    timestamp: Math.floor(Date.now() / 1000)
   };
 
   const newgPointsUpdate = new gPointsUpdate(info);

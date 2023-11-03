@@ -1,6 +1,7 @@
 const {gpuMarketplaceContractInstance} = require('..//Contract/contract.js')
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 const Order = require('../Schemas/order.js')
+const gPointsUpdate = require('../Schemas/gPointsUpdate.js')
 
 const getUserInfo = async(req,res) => {
 
@@ -31,23 +32,55 @@ const getUserInfo = async(req,res) => {
           }
         }
 
-        const info = await Order.find({"renterId":UID});
-        const orderCount = info.length
-        let totalHoursRented = 0
-        let totalGpointsPaid = 0
-    
-        for(const order of info ){
-          totalHoursRented += order.hoursRented
-          totalGpointsPaid += order.gPointsPaid
+        const startTimestamp = ((Math.floor(Date.now() / 1000)) - (24*60*60*7))
+        const allGpointsUpdate = []
+
+        const gPointsInfo = await gPointsUpdate.find({
+          "user":walletAddress,
+          "timestamp": {$gte:startTimestamp}
+        });
+
+        for(const update of gPointsInfo){
+          
+          if(update.orderType!=1){
+            allGpointsUpdate.push({
+              "amount":update.amount,
+              "timestamp":update.timestamp
+            })
+          }
+
+          else{
+            allGpointsUpdate.push({
+              "amount":-update.amount,
+              "timestamp":update.timestamp
+            })
+          }
+        
         }
+
+
+        // const info = await Order.find({"renterId":UID});
+        // const orderCount = info.length
+        // let totalHoursRented = 0
+        // let totalGpointsPaid = 0
     
-        const avgOrderValue = totalGpointsPaid/orderCount
-        const avgHoursRented = totalHoursRented/orderCount
+        // for(const order of info ){
+        //   totalHoursRented += order.hoursRented
+        //   totalGpointsPaid += order.gPointsPaid
+        // }
     
+        // const avgOrderValue = totalGpointsPaid/orderCount
+        // const avgHoursRented = totalHoursRented/orderCount
+    
+        // const finalResponse = {
+        //   "avgOrderValue":avgOrderValue,
+        //   "avgHoursRented":avgHoursRented,
+        //   "machineListed":machineListed
+        // }
+
         const finalResponse = {
-          "avgOrderValue":avgOrderValue,
-          "avgHoursRented":avgHoursRented,
-          "machineListed":machineListed
+          "machineListed":machineListed,
+          "gPointsUpdate":allGpointsUpdate
         }
     
         res.json({ success: true, message: finalResponse });
