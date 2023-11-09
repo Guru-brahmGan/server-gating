@@ -105,7 +105,11 @@ app.get("/getBlock", async (req, res) => {
     currentBlock: currentBlock,
   });
 });
-
+app.get("/healthCheck", async(req,res)=>{
+  res.status(200).json({
+    status: "Server is working fine."
+  });
+});
 app.post("/generateSignature", async (req, res) => {
   await generateSignature(req,res)
 });
