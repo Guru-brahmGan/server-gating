@@ -7,6 +7,7 @@ require('dotenv').config()
 const {gpuMarketplaceContractInstance, gpuMarketplaceContractWSInstance} = require('./Contract/contract.js')
 const {provider} = gpuMarketplaceContractInstance()
 const {gpuMarketplaceContractWS} = gpuMarketplaceContractWSInstance()
+const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 
 const MachineRented = require("./Schemas/machineRented");
 const MachineListed = require("./Schemas/machineListed");
@@ -112,6 +113,23 @@ app.post("/generateSignature", async (req, res) => {
 
 app.post("/registerUser", async (req, res) => {
   await registerUser(req,res)
+});
+
+app.post("/verifyTweet", async(req, res) => {
+  const userAddress = req.body.userAddress;
+  try {
+    const tweeted = await gpuMarketplaceContract.verifyTweet(userAddress);
+    res.json({ success: true, message: "Verified successfully" });
+  } catch (e) {
+    console.error("Error registering user:", e);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to register user",
+        error: e.message,
+      });
+  }
 });
 
 app.post("/isAUser", async (req, res) => {

@@ -1,5 +1,80 @@
 [
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_orderId",
+				"type": "uint256"
+			}
+		],
+		"name": "cancelOrder",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_orderId",
+				"type": "uint256"
+			}
+		],
+		"name": "completeOrder",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "gPBuy",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "txId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "gPToCredit",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "userId",
+				"type": "uint256"
+			}
+		],
+		"name": "gPBuyWithStripe",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_machineId",
+				"type": "uint256"
+			}
+		],
+		"name": "listMachineToggle",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -88,6 +163,230 @@
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_cpuname",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_gpuname",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_spuVRam",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_totalRam",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_memorySize",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_coreCount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_ipAddr",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "_openedPorts",
+				"type": "uint256[]"
+			},
+			{
+				"internalType": "string",
+				"name": "_region",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_bidprice",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "provider",
+				"type": "address"
+			}
+		],
+		"name": "registerMachines",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "referrerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_organization",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "userAddress",
+				"type": "address"
+			}
+		],
+		"name": "registerUser",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_machineId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_rentalDuration",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_userId",
+				"type": "uint256"
+			}
+		],
+		"name": "rentMachine",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_machineId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_bidAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "setBidPrice",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_gPoints",
+				"type": "uint256"
+			}
+		],
+		"name": "setBundleInfo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newSerPub",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_newFundshandler",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_newToken",
+				"type": "address"
+			}
+		],
+		"name": "setKeys",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "newAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "setReferRewards",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -109,33 +408,14 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "UIDtoAddress",
-		"outputs": [
-			{
 				"internalType": "address",
-				"name": "",
+				"name": "tweetedUser",
 				"type": "address"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "USDC_ADDRESS",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
+		"name": "verifyTweet",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -161,19 +441,6 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_orderId",
-				"type": "uint256"
-			}
-		],
-		"name": "cancelOrder",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
 				"name": "idToFetch",
 				"type": "uint256"
 			}
@@ -187,19 +454,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_orderId",
-				"type": "uint256"
-			}
-		],
-		"name": "completeOrder",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -218,19 +472,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "gPBuy",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "toFetch",
 				"type": "address"
@@ -242,6 +483,25 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "hasTweeted",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -305,19 +565,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_machineId",
-				"type": "uint256"
-			}
-		],
-		"name": "listMachineToggle",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "machineId",
 		"outputs": [
@@ -325,25 +572,6 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "machineToOwner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -413,6 +641,11 @@
 				"internalType": "bool",
 				"name": "isListed",
 				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isRented",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -432,6 +665,25 @@
 				"internalType": "uint256[]",
 				"name": "",
 				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "machineToOwner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -527,150 +779,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_cpuname",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_gpuname",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_spuVRam",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_totalRam",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_memorySize",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_coreCount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "_ipAddr",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256[]",
-				"name": "_openedPorts",
-				"type": "uint256[]"
-			},
-			{
-				"internalType": "string",
-				"name": "_region",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_bidprice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "provider",
-				"type": "address"
-			}
-		],
-		"name": "registerMachines",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "referrerId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes",
-				"name": "signature",
-				"type": "bytes"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "messageHash",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "address",
-				"name": "userAddress",
-				"type": "address"
-			}
-		],
-		"name": "registerUser",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_machineId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_rentalDuration",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_userId",
-				"type": "uint256"
-			}
-		],
-		"name": "rentMachine",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "serverPublicAddress",
 		"outputs": [
@@ -686,68 +794,52 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "_amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_gPoints",
-				"type": "uint256"
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
-		"name": "setBundleInfo",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
+		"name": "stripeTxProcessed",
+		"outputs": [
 			{
-				"internalType": "address",
-				"name": "newSerPub",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_newFundshandler",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_newToken",
-				"type": "address"
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
-		"name": "setKeys",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "newAmount",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "setReferRewards",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
+		"name": "UIDtoAddress",
+		"outputs": [
 			{
 				"internalType": "address",
-				"name": "newOwner",
+				"name": "",
 				"type": "address"
 			}
 		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "USDC_ADDRESS",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -803,6 +895,11 @@
 				"type": "uint256"
 			},
 			{
+				"internalType": "string",
+				"name": "organization",
+				"type": "string"
+			},
+			{
 				"internalType": "bool",
 				"name": "isProvider",
 				"type": "bool"
@@ -821,9 +918,15 @@
 				"internalType": "uint16",
 				"name": "refCount",
 				"type": "uint16"
+			},
+			{
+				"internalType": "address",
+				"name": "referredBy",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
 		"type": "function"
 	}
 ]
+
