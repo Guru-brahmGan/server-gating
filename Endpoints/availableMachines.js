@@ -18,8 +18,10 @@ const availableMachines = async(req,res) => {
     
           var responses = await Promise.all(allContractCall);
     
-          for (const machineInfo of responses) {
+          for (let i = 0; i < responses.length; i++) {
+            const machineInfo = responses[i];
             const info = {
+              machineId: 10000 + i + 1,
               cpuName: machineInfo.cpuName,
               gpuName: machineInfo.gpuName,
               gpuVRAM: parseInt(machineInfo.gpuVRAM),
