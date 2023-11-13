@@ -25,7 +25,8 @@ const registerMachine = require("./Endpoints/registerMachine.js");
 const rentMachine = require("./Endpoints/rentMachine.js");
 const getUserInfo = require("./Endpoints/getUserInfo.js")
 const dummyMachinesUpdate = require("./Endpoints/dummyMachinesUpdate.js")
- 
+const initSSH = require("./Endpoints/initSSH.js")
+
 const app = express();
 const port = 3000;
 
@@ -108,11 +109,13 @@ app.get("/getBlock", async (req, res) => {
     currentBlock: currentBlock,
   });
 });
+
 app.get("/healthCheck", async(req,res)=>{
   res.status(200).json({
     status: "Server is working fine."
   });
 });
+
 app.post("/generateSignature", async (req, res) => {
   await generateSignature(req,res)
 });
@@ -139,33 +142,7 @@ app.post("/verifyTweet", async(req, res) => {
 });
 
 app.post("/init_ssh", async(req,res) => {
-  const orderId = req.body.orderId;
-  const maxOrderId = parseInt(await gpuMarketplaceContract.orderId());
-  const orderInfo = await gpuMarketplaceContract.orders(orderId);
-  const machineId = parseInt(orderInfo.machineId);
-  const machineDetails = await gpuMarketplaceContract.machines(machineId);
-  const ipAddress = machineDetails.IPAddress;
-  const linkToSsh = "http://" + ipAddress + ":8080/init_ssh";
-  const dataToSend = {
-    "aws_access_key_id": process.env.aws_access_key_id,
-    "aws_secret_access_key": process.env.aws_secret_access_key,
-    "aws_region": process.env.aws_region,
-    "ecr_repo": process.env.ecr_repo,
-    "order_id": orderId,
-    "order_duration": parseInt(orderInfo.rentalDuration)
-  }
-  const initSSHResponse = await axios.post(
-    linkToSsh,
-    dataToSend
-  );
-  res.status(200).json({
-    "machineId": machineId,
-    "ipAddress" : ipAddress,
-    "sshLink": linkToSsh,
-    "maxOrderId": maxOrderId,
-    "dataTo": dataToSend,
-    "sshlink": initSSHResponse.data
-  })
+ await initSSH(req,res)
 })
 
 app.post("/isAUser", async (req, res) => {
