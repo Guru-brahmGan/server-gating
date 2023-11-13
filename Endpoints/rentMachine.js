@@ -12,18 +12,18 @@ const rentMachine = async(req,res) => {
         const userId = req.body.userId;
     
         // Call the rentMachine function in smart contract and get the orderId
-        const order = parseint(await gpuMarketplaceContract.rentMachine(
+        const order = await gpuMarketplaceContract.rentMachine(
           machineId,
           rentalDuration,
           userId
-        ));
+        );
         // const orderId = await gpuMarketplaceContract.orderId();
         // console.log(orderId);
         // Respond with the orderId
         // Calculate the timestamp when SSH access should be revoked
         const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
         const revokeTime = currentTime + rentalDuration * 3600; // Convert hours to seconds
-    
+        const orderId = parseInt(await gpuMarketplaceContract.orderId());
         // Initiate SSH access by calling the external endpoint
         // const initSSHResponse = await axios.post(
         //   "http://3.220.122.237:8080/init_ssh",
@@ -36,8 +36,7 @@ const rentMachine = async(req,res) => {
         res.json({
           success: true,
           message: "Machine rented successfully",
-          orderId: order,
-          SSHInitiationResponse: initSSHResponse.data, // Include the response from SSH initiation
+          orderId: orderId
         });
     
         // Set a timeout to automatically call the revoke SSH access endpoint

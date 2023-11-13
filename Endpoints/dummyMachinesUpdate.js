@@ -42,7 +42,7 @@ const dummyMachinesUpdate = async(req,res) => {
 
       }catch (e) {
         console.log(e);
-        res.json({ success: false, message: "Something went wrong." });
+        res.json({ success: false, message: e.message });
       }
 
 }

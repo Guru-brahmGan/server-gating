@@ -13,10 +13,10 @@ const availableMachines = async(req,res) => {
         const machinesIgnored = await DummyMachines.find({});
   
         for(const machine of machinesIgnored){
-            machinesIgnoredList.push(machine.machineId)
+          machinesIgnoredList.push(machine.machineId)
         }
   
-    
+        console.log(machinesIgnored);
         if (maxMachineId > 10000) {
           const allContractCall = [];
           let currentMachineId = 10001;
