@@ -149,6 +149,26 @@ app.post("/isAUser", async (req, res) => {
   await isAUser(req,res)
 });
 
+app.post("/setBidPrice", async (req, res) => {
+  const machineId = req.body.machineId;
+  const newBidPrie = req.body.bidAmount;
+  const setBid = await gpuMarketplaceContract.setBidPrice(machineId, newBidPrie);
+  console.log(setBid)
+  res.json({
+    message: "Bid Price is set successfully",
+    txHash: setBid.hash
+  })
+})
+
+app.post("/listToggle", async (req, res) => {
+  const machineId = req.body.machineId;
+  const setToggle = await gpuMarketplaceContract.listMachineToggle(machineId);
+  res.json({
+    message: "Successful",
+    txHash: setToggle.hash
+  })
+})
+
 // app.post('/rentMachine', async (req, res) => {
 //     const orderDetails = req.body;
 
