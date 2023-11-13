@@ -24,7 +24,8 @@ const getMachineDetails = require('./Endpoints/getMachineDetails.js');
 const registerMachine = require("./Endpoints/registerMachine.js");
 const rentMachine = require("./Endpoints/rentMachine.js");
 const getUserInfo = require("./Endpoints/getUserInfo.js")
-
+const dummyMachinesUpdate = require("./Endpoints/dummyMachinesUpdate.js")
+ 
 const app = express();
 const port = 3000;
 
@@ -269,6 +270,10 @@ app.post("/getUserInfo", async (req ,res) => {
 
 app.post("/getMachineDetails", async (req, res) => {
   await getMachineDetails(req,res)
+});
+
+app.post("/dummyMachines", async (req, res) => {
+  await dummyMachinesUpdate(req,res)
 });
 
 app.post("/registerMachine", async (req, res) => {

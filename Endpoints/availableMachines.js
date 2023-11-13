@@ -1,11 +1,21 @@
 const {gpuMarketplaceContractInstance} = require('..//Contract/contract.js')
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
+const DummyMachines = require('../Schemas/dummyMachines.js')
 
 const availableMachines = async(req,res) => {
 
     try {
         const maxMachineId = parseInt(await gpuMarketplaceContract.machineId());
         let allMachines = [];
+
+        let machinesIgnoredList = []
+
+        const machinesIgnored = await DummyMachines.find({});
+  
+        for(const machine of machinesIgnored){
+            machinesIgnoredList.push(machine.machineId)
+        }
+  
     
         if (maxMachineId > 10000) {
           const allContractCall = [];
@@ -19,24 +29,30 @@ const availableMachines = async(req,res) => {
           var responses = await Promise.all(allContractCall);
     
           for (let i = 0; i < responses.length; i++) {
-            const machineInfo = responses[i];
-            const info = {
-              machineId: 10000 + i + 1,
-              cpuName: machineInfo.cpuName,
-              gpuName: machineInfo.gpuName,
-              gpuVRAM: parseInt(machineInfo.gpuVRAM),
-              totalRAM: parseInt(machineInfo.totalRAM),
-              storageAvailable: parseInt(machineInfo.storageAvailable),
-              coreCount: parseInt(machineInfo.coreCount),
-              IPAddress: machineInfo.IPAddress,
-              portsOpen: machineInfo.portsOpen,
-              region: machineInfo.region,
-              bidPrice: parseInt(machineInfo.bidPrice),
-              isAvailable: machineInfo.isAvailable,
-              isListed: machineInfo.isListed,
-            };
-    
-            allMachines.push(info);
+
+            if(!(machinesIgnoredList.includes(10000 + i + 1))){
+
+              const machineInfo = responses[i];
+              const info = {
+                machineId: 10000 + i + 1,
+                cpuName: machineInfo.cpuName,
+                gpuName: machineInfo.gpuName,
+                gpuVRAM: parseInt(machineInfo.gpuVRAM),
+                totalRAM: parseInt(machineInfo.totalRAM),
+                storageAvailable: parseInt(machineInfo.storageAvailable),
+                coreCount: parseInt(machineInfo.coreCount),
+                IPAddress: machineInfo.IPAddress,
+                portsOpen: machineInfo.portsOpen,
+                region: machineInfo.region,
+                bidPrice: parseInt(machineInfo.bidPrice),
+                isAvailable: machineInfo.isAvailable,
+                isListed: machineInfo.isListed,
+              };
+      
+              allMachines.push(info);
+
+            } 
+
           }
     
           res.json({
