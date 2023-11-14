@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const axios = require("axios");
 require('dotenv').config()
+const SshLinksUpdate = require('./Schemas/sshLink.js')
 
 const {gpuMarketplaceContractInstance, gpuMarketplaceContractWSInstance} = require('./Contract/contract.js')
 const {provider} = gpuMarketplaceContractInstance()
@@ -119,6 +120,28 @@ app.get("/healthCheck", async(req,res)=>{
 app.post("/generateSignature", async (req, res) => {
   await generateSignature(req,res)
 });
+
+app.post('/get_ssh', async (req, res) => {
+  try {
+      const orderId  = req.body.orderId;
+
+      // Find the SSH link for the given orderId
+      const sshLinkEntry = await SshLinksUpdate.findOne({ orderId: orderId });
+
+      if (!sshLinkEntry) {
+          return res.status(404).json({ success: false, message: 'SSH link not found for the given orderId' });
+      }
+
+      res.json({
+          success: true,
+          sshLink: sshLinkEntry.sshLink
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 
 app.post("/registerUser", async (req, res) => {
   await registerUser(req,res)
@@ -239,6 +262,11 @@ app.post("/userOrders", async (req, res) => {
 
 app.post("/getUserInfo", async (req ,res) => {
   await getUserInfo(req,res)
+})
+
+app.get("rentedMachines", async (req, res) => {
+  const userAddress = req.body.walletAddress;
+  
 })
 
 // async function getOrderDetails(orderId) {

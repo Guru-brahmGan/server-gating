@@ -3,7 +3,7 @@ const gpuMarketplaceABI = require("./gpuMarketplaceABI.json");
 require('dotenv').config()
 
 const SERVER_PRIVATE_KEY = process.env.SERVER_PRIVATE_KEY;
-const gpuMarketplaceAddress = "0x4fcCcC932d5374DEC686B60346307f9Eeb773292";
+const gpuMarketplaceAddress = "0x0365a918d7c36a952e569B491DAac54c0FF777B7";
 
 
 const gpuMarketplaceContract = () => {

@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
     renterUsername: String,
     gPointsPaid: Number,
     hoursRented: Number,
-    sshLink: Number,
+    sshLink: String,
     },
     { collection: 'Order', versionKey: false }
 );

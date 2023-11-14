@@ -1,3 +1,6 @@
+const {gpuMarketplaceContractInstance} = require('..//Contract/contract.js');
+const {gpuMarketplaceContract} = gpuMarketplaceContractInstance();
+const axios = require("axios");
 
 const initSSH = async(req,res) => {
 
@@ -18,10 +21,10 @@ const initSSH = async(req,res) => {
       "order_duration": parseInt(orderInfo.orderTimestamp + (orderInfo.rentalDuration*60*60))
     }
 
-    const initSSHResponse = await axios.post(
-      linkToSsh,
-      dataToSend
-    );
+    // const initSSHResponse = await axios.post(
+    //   linkToSsh,
+    //   dataToSend
+    // );
 
     res.status(200).json({
       "machineId": machineId,
@@ -29,7 +32,7 @@ const initSSH = async(req,res) => {
       "sshLink": linkToSsh,
       "maxOrderId": maxOrderId,
       "dataTo": dataToSend,
-      "sshlink": initSSHResponse.data
+      // "sshlink": initSSHResponse.data
     })
 
 }
