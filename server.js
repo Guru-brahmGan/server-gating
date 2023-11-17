@@ -347,9 +347,17 @@ app.post("/gPBuyWithStripe", async(req, res) => {
 
 app.get("/getBundleInfo", async(req, res) => {
   try{
-    const firstBundle = parseInt(await gpuMarketplaceContract.bundleInfo(85000));
+    const firstBundle = parseInt(await gpuMarketplaceContract.bundleInfo(10));
+    const secondBundle = parseInt(await gpuMarketplaceContract.bundleInfo(95));
+    const thirdBundle = parseInt(await gpuMarketplaceContract.bundleInfo(900));
+    const fourthBundle = parseInt(await gpuMarketplaceContract.bundleInfo(85000));
     res.json({
-      GPAmount: firstBundle
+      bundles: [
+        { usdAmount: 10, gPoints: firstBundle },
+        { usdAmount: 95, gPoints: secondBundle },
+        { usdAmount: 900, gPoints: thirdBundle },
+        { usdAmount: 85000, gPoints: fourthBundle }
+      ]
     })
   } catch (e) {
     res.status(500).json({
