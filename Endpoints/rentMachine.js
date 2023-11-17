@@ -1,7 +1,7 @@
 const {gpuMarketplaceContractInstance} = require('..//Contract/contract.js')
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
-const axios = require("axios");
 const Order = require('../Schemas/order.js')
+const orderTimeoutUpdate = require("../Schemas/orderTimeout.js")
 
 const rentMachine = async(req,res) => {
 
@@ -17,13 +17,18 @@ const rentMachine = async(req,res) => {
           rentalDuration,
           userId
         );
+
+        const currentTime = Math.floor(Date.now() / 1000);
+        const revokeTime = currentTime + rentalDuration * 3600; 
+        const orderId = parseInt(order);
+        await orderTimeoutUpdate.create({ orderId, revokeTime });
+
         // const orderId = await gpuMarketplaceContract.orderId();
         // console.log(orderId);
         // Respond with the orderId
         // Calculate the timestamp when SSH access should be revoked
         // const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
         // const revokeTime = currentTime + rentalDuration * 3600; // Convert hours to seconds
-        const orderId = parseInt(await gpuMarketplaceContract.orderId());
         // Initiate SSH access by calling the external endpoint
         // const initSSHResponse = await axios.post(
         //   "http://3.220.122.237:8080/init_ssh",
@@ -31,7 +36,7 @@ const rentMachine = async(req,res) => {
         // );
         // orderId: order, // Pass the orderId to identify the machine
         // revokeTime: revokeTime, // Pass the revoke time to set the timeout
-    
+
         // Respond with the orderId and the response from the SSH initialization endpoint
         res.json({
           success: true,

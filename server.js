@@ -5,7 +5,6 @@ const cors = require("cors");
 const axios = require("axios");
 require('dotenv').config()
 const stripe = require("stripe")(`${process.env.STRIPE_PRIVATE_KEY}`);
-const SshLinksUpdate = require('./Schemas/sshLink.js')
 
 const {gpuMarketplaceContractInstance, gpuMarketplaceContractWSInstance} = require('./Contract/contract.js')
 const {provider} = gpuMarketplaceContractInstance()
@@ -15,6 +14,7 @@ const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 const MachineRented = require("./Schemas/machineRented");
 const MachineListed = require("./Schemas/machineListed");
 const gPointsUpdate = require("./Schemas/gPointsUpdate");
+const sshLinksUpdate = require('./Schemas/sshLink.js')
 
 const isAUser = require('./Endpoints/isAUser.js')
 const generateSignature = require('./Endpoints/generateSignature.js')
@@ -28,6 +28,7 @@ const rentMachine = require("./Endpoints/rentMachine.js");
 const getUserInfo = require("./Endpoints/getUserInfo.js")
 const dummyMachinesUpdate = require("./Endpoints/dummyMachinesUpdate.js")
 const initSSH = require("./Endpoints/initSSH.js")
+const orderTimeoutFunction = require("./Utils/orderTimeout.js")
 
 const app = express();
 const port = 3000;
@@ -127,7 +128,7 @@ app.post('/get_ssh', async (req, res) => {
       const orderId  = req.body.orderId;
 
       // Find the SSH link for the given orderId
-      const sshLinkEntry = await SshLinksUpdate.findOne({ orderId: orderId });
+      const sshLinkEntry = await sshLinksUpdate.findOne({ orderId: orderId });
 
       if (!sshLinkEntry) {
           return res.status(404).json({ success: false, message: 'SSH link not found for the given orderId' });
@@ -142,7 +143,6 @@ app.post('/get_ssh', async (req, res) => {
       res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
-
 
 app.post("/registerUser", async (req, res) => {
   await registerUser(req,res)
