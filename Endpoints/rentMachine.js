@@ -21,8 +21,8 @@ const rentMachine = async(req,res) => {
         // console.log(orderId);
         // Respond with the orderId
         // Calculate the timestamp when SSH access should be revoked
-        const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
-        const revokeTime = currentTime + rentalDuration * 3600; // Convert hours to seconds
+        // const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
+        // const revokeTime = currentTime + rentalDuration * 3600; // Convert hours to seconds
         const orderId = parseInt(await gpuMarketplaceContract.orderId());
         // Initiate SSH access by calling the external endpoint
         // const initSSHResponse = await axios.post(
@@ -40,20 +40,20 @@ const rentMachine = async(req,res) => {
         });
     
         // Set a timeout to automatically call the revoke SSH access endpoint
-        const timeoutInMilliseconds = rentalDuration * 3600 * 1000; // Convert hours to milliseconds
-        setTimeout(async () => {
-          try {
-            // Call the revoke SSH access endpoint
-            const revokeSSHResponse = await axios.post(
-              "http://3.220.122.237:8080/revoke_ssh",
-              {}
-            );
-            // orderId: order, // Pass the orderId to identify the machine
-            console.log("SSH access revoked:", revokeSSHResponse.data);
-          } catch (error) {
-            console.error("Error revoking SSH access:", error.message);
-          }
-        }, timeoutInMilliseconds);
+        // const timeoutInMilliseconds = rentalDuration * 3600 * 1000; // Convert hours to milliseconds
+        // setTimeout(async () => {
+        //   try {
+        //     // Call the revoke SSH access endpoint
+        //     const revokeSSHResponse = await axios.post(
+        //       "http://3.220.122.237:8080/revoke_ssh",
+        //       {}
+        //     );
+        //     // orderId: order, // Pass the orderId to identify the machine
+        //     console.log("SSH access revoked:", revokeSSHResponse.data);
+        //   } catch (error) {
+        //     console.error("Error revoking SSH access:", error.message);
+        //   }
+        // }, timeoutInMilliseconds);
       } catch (error) {
         console.error("Error renting a machine:", error);
         res
