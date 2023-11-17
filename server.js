@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const axios = require("axios");
 require('dotenv').config()
+const stripe = require("stripe")(`${process.env.STRIPE_PRIVATE_KEY}`);
 const SshLinksUpdate = require('./Schemas/sshLink.js')
 
 const {gpuMarketplaceContractInstance, gpuMarketplaceContractWSInstance} = require('./Contract/contract.js')
@@ -304,6 +305,58 @@ app.post("/dummyMachines", async (req, res) => {
 app.post("/registerMachine", async (req, res) => {
   await registerMachine(req,res)
 });
+
+const storeItems = new Map([[
+  1, {priceInCents: 1000, bundleName: '100 GPoints'}],
+  [2, {priceInCents: 9500, bundleName: '1000 GPoints'}],
+  [3, {priceInCents: 90000, bundleName: '10000 GPoints'}],
+  [4, {priceInCents: 8500000, bundleName: '1Mn GPoints'}],
+
+])
+
+app.post("/gPBuyWithStripe", async(req, res) => {
+  try{
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: req.body.items.map(item => {
+        const storeItem = storeItems.get(item.id)
+        return {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: storeItem.bundleName
+            },
+            unit_amount: storeItem.priceInCents
+          },
+          quantity: 1
+        }
+      }),
+      success_url: `https://app.gpu.net/success`,
+      cancel_url: `https://app.gpu.net/payment-failure`
+    })
+    res.json({
+      url: session.url
+    })
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    })
+  }
+})
+
+app.get("/getBundleInfo", async(req, res) => {
+  try{
+    const firstBundle = parseInt(await gpuMarketplaceContract.bundleInfo(85000));
+    res.json({
+      GPAmount: firstBundle
+    })
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    })
+  }
+})
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
