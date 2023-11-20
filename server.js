@@ -15,7 +15,7 @@ const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 const MachineRented = require("./Schemas/machineRented");
 const MachineListed = require("./Schemas/machineListed");
 const gPointsUpdate = require("./Schemas/gPointsUpdate");
-
+const customRequestUpdate = require("./Schemas/customRequest.js");
 const isAUser = require('./Endpoints/isAUser.js')
 const generateSignature = require('./Endpoints/generateSignature.js')
 const registerUser = require('./Endpoints/registerUser.js')
@@ -344,6 +344,32 @@ app.post("/gPBuyWithStripe", async(req, res) => {
     })
   }
 })
+
+app.post('/customGpuRequest', async (req, res) => {
+  try {
+    const username = req.body.username;  
+    const GPUname = req.body.GPUname;
+      const Quantity = req.body.Quantity;
+
+      // Create a new custom request
+      const newCustomRequest = new customRequestUpdate({
+        username,
+        GPUname,
+        Quantity
+      });
+
+      // Save the request to the database
+      await newCustomRequest.save();
+
+      // Send a response back to the client
+      res.status(201).json({
+          message: 'Custom GPU request submitted successfully',
+          data: newCustomRequest
+      });
+  } catch (error) {
+      res.status(500).json({ message: 'Error submitting custom GPU request', error: error.message });
+  }
+});
 
 app.get("/getBundleInfo", async(req, res) => {
   try{
