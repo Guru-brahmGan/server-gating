@@ -25,7 +25,7 @@ const userOrders = require('./Endpoints/userOrders.js')
 const getMachineDetails = require('./Endpoints/getMachineDetails.js');
 const registerMachine = require("./Endpoints/registerMachine.js");
 const rentMachine = require("./Endpoints/rentMachine.js");
-const getUserInfo = require("./Endpoints/getUserInfo.js")
+const getUserInfo = require("./Endpoints/getUserInfo.js");
 const dummyMachinesUpdate = require("./Endpoints/dummyMachinesUpdate.js")
 const initSSH = require("./Endpoints/initSSH.js")
 const orderTimeoutFunction = require("./Utils/orderTimeout.js")
@@ -384,6 +384,20 @@ app.get("/getBundleInfo", async(req, res) => {
         { usdAmount: 900, gPoints: thirdBundle },
         { usdAmount: 85000, gPoints: fourthBundle }
       ]
+    })
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    })
+  }
+})
+
+app.get("/getMachinesOwned", async(req, res) => {
+  try{
+    const walletAddress = req.body.walletAddress;
+    const gpuList = parseInt(await gpuMarketplaceContract.machinesOwned(walletAddress));
+    res.json({
+      bundles : gpuList
     })
   } catch (e) {
     res.status(500).json({
