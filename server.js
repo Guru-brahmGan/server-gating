@@ -395,9 +395,10 @@ app.get("/getBundleInfo", async(req, res) => {
 app.get("/getMachinesOwned", async(req, res) => {
   try{
     const walletAddress = req.body.walletAddress;
-    const gpuList = parseInt(await gpuMarketplaceContract.machinesOwned(walletAddress));
+    const gpuList = await gpuMarketplaceContract.machinesOwned(walletAddress);
+    const parsedGpuList = gpuList.map(id => parseInt(id));
     res.json({
-      bundles : gpuList
+      bundles : parsedGpuList
     })
   } catch (e) {
     res.status(500).json({
