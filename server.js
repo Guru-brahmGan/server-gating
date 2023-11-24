@@ -345,6 +345,33 @@ app.post("/gPBuyWithStripe", async(req, res) => {
   }
 })
 
+app.post('/stripeWebhook', bodyParser.raw({type: 'application/json'}), (req, res) => {
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const sig = req.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err) {
+    console.error('Webhook Error:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  switch (event.type) {
+
+    case 'checkout.session.completed':
+      const session = event.data.object;
+      console.log('Payment successful. Session ID:', session.id);
+      break;
+
+  }
+
+  res.json({received: true});
+
+});
+
 app.post('/customGpuRequest', async (req, res) => {
   try {
     const username = req.body.username;  
