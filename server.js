@@ -184,6 +184,19 @@ app.post("/setBidPrice", async (req, res) => {
   })
 })
 
+app.post("/dashboardAnalytics", async (req, res) => {
+  const walletAddress = req.body.walletAddress;
+  const user = await gpuMarketplaceContract.users(walletAddress);
+  const gpBalance = parseInt(user.gPointsBalance)
+  const gpuList = await gpuMarketplaceContract.machinesOwned(walletAddress);
+  const parsedGpuList = gpuList.map(id => parseInt(id));
+  const listedCount = parsedGpuList.length;
+  res.json({
+    gPoints: gpBalance,
+    listedCount: listedCount
+  })
+})
+
 app.post("/listToggle", async (req, res) => {
   const machineId = req.body.machineId;
   const setToggle = await gpuMarketplaceContract.listMachineToggle(machineId);
@@ -392,7 +405,20 @@ app.get("/getBundleInfo", async(req, res) => {
   }
 })
 
-app.get("/getMachinesOwned", async(req, res) => {
+app.post("/gPStripe", async(req, res) => {
+  try{
+    const stripeGpBuy = await gpuMarketplaceContract.gPBuyWithStripe()
+    res.json({
+      url: session.url
+    })
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    })
+  }
+})
+
+app.post("/getMachinesOwned", async(req, res) => {
   try{
     const walletAddress = req.body.walletAddress;
     const gpuList = await gpuMarketplaceContract.machinesOwned(walletAddress);
