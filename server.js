@@ -45,7 +45,6 @@ db.once("open", () => {
   console.log("Connected to MongoDB");
 });
 
-app.use(bodyParser.json());
 app.use(cors());
 
 gpuMarketplaceContractWS.on("MachineListed", (_machineId, _name) => {
@@ -357,6 +356,35 @@ app.post("/gPBuyWithStripe", async(req, res) => {
     })
   }
 })
+
+app.post('/stripeWebhook', express.raw({type: 'application/json'}), (req, res) => {
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const sig = req.headers['stripe-signature'];
+  const payload = req.body
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(payload, sig, webhookSecret);
+    console.log(event.type)
+  } catch (err) {
+    console.error('Webhook Error:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  switch (event.type) {
+
+    case 'payment_intent.succeeded':
+      const session = event.data.object;
+      console.log('Payment successful. Session ID:', session.id);
+      break;
+
+  }
+
+  res.json({received: true});
+
+});
 
 app.post('/customGpuRequest', async (req, res) => {
   try {
