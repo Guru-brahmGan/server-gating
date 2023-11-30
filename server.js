@@ -44,7 +44,7 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
   console.log("Connected to MongoDB");
 });
-
+app.use(bodyParser.json());
 app.use(cors());
 
 gpuMarketplaceContractWS.on("MachineListed", (_machineId, _name) => {
@@ -390,7 +390,7 @@ app.post('/customGpuRequest', async (req, res) => {
   try {
     const username = req.body.username;  
     const GPUname = req.body.GPUname;
-      const Quantity = req.body.Quantity;
+    const Quantity = req.body.Quantity;
 
       // Create a new custom request
       const newCustomRequest = new customRequestUpdate({
@@ -448,8 +448,9 @@ app.post("/gPStripe", async(req, res) => {
 
 app.post("/getMachinesOwned", async(req, res) => {
   try{
-    const walletAddress = req.body.walletAddress;
-    const gpuList = await gpuMarketplaceContract.machinesOwned(walletAddress);
+    const address = req.body.walletId;
+    console.log(address)
+    const gpuList = await gpuMarketplaceContract.machinesOwned(address);
     const parsedGpuList = gpuList.map(id => parseInt(id));
     res.json({
       bundles : parsedGpuList
