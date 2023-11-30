@@ -446,6 +446,27 @@ app.post("/gPStripe", async(req, res) => {
   }
 })
 
+app.post('/getOrderSSH', async (req, res) => {
+  try {
+      const orderId  = req.body.orderId;
+
+      if (!orderId) {
+          return res.status(400).json({ message: 'orderId is required' });
+      }
+
+      const sshLinkEntry = await sshLinksUpdate.findOne({ orderId: orderId });
+
+      if (!sshLinkEntry) {
+          return res.status(404).json({ message: 'SSH link not found for the given orderId' });
+      }
+
+      res.json(sshLinkEntry);
+  } catch (error) {
+      console.error('Error fetching SSH link:', error);
+      res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+});
+
 app.post("/getMachinesOwned", async(req, res) => {
   try{
     const address = req.body.walletId;
