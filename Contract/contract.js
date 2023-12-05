@@ -3,13 +3,13 @@ const gpuMarketplaceABI = require("./gpuMarketplaceABI.json");
 require('dotenv').config()
 
 const SERVER_PRIVATE_KEY = process.env.SERVER_PRIVATE_KEY;
-const gpuMarketplaceAddress = "0x0365a918d7c36a952e569B491DAac54c0FF777B7";
+const gpuMarketplaceAddress = "0xc22425f7D0382DeCF4A98C8088612107459A64e7";
 
 
 const gpuMarketplaceContract = () => {
 
     const provider = new ethers.providers.JsonRpcProvider(
-        `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_KEY}`
+        `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_KEY}`
     );
     
     const wallet = new ethers.Wallet(SERVER_PRIVATE_KEY);
@@ -28,7 +28,7 @@ const gpuMarketplaceContract = () => {
 const gpuMarketplaceContractWS = () => {
 
     const websocketProvider = new ethers.providers.WebSocketProvider(
-        `wss://polygon-mumbai.infura.io/ws/v3/${process.env.INFURA_KEY}`
+        `wss://polygon-mainnet.infura.io/ws/v3/${process.env.INFURA_KEY}`
     );
 
     const wallet = new ethers.Wallet(SERVER_PRIVATE_KEY);
