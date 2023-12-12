@@ -1,5 +1,6 @@
 const {gpuMarketplaceContractInstance} = require('..//Contract/contract.js')
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
+const txIdUsed = require('../Schemas/txIdUsed.js')
 
 function generateRandomString(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -39,9 +40,13 @@ const registerUser = async(req,res) => {
           console.log(txId);
           const addGPoints = await gpuMarketplaceContract.gPBuyWithStripe(
             txId,
-            3000,
+            1000,
             clientUserId
           );
+          const savedTx = new txIdUsed({
+            txId
+          })
+          await savedTx.save();
         } else {
           const register = await gpuMarketplaceContract.registerUser(
             name,
@@ -49,6 +54,7 @@ const registerUser = async(req,res) => {
             orgName,
             userAddress
           );
+          nonClientUserId = parseInt(register);
         }
         
         
