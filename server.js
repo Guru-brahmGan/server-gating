@@ -121,7 +121,12 @@ app.get("/healthCheck", async(req,res)=>{
 app.post("/generateSignature", async (req, res) => {
   await generateSignature(req,res)
 });
-
+app.post('/getOrderId', async (req, res) => {
+  const maxOrderId = parseInt(await gpuMarketplaceContract.orderId());
+  res.json({
+    orderId: maxOrderId
+  })
+})
 app.post('/get_ssh', async (req, res) => {
   try {
       const orderId  = req.body.orderId;
