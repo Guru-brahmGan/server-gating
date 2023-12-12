@@ -1,6 +1,16 @@
 const {gpuMarketplaceContractInstance} = require('..//Contract/contract.js')
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 
+function generateRandomString(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
 const registerUser = async(req,res) => {
 
     try {
@@ -16,15 +26,35 @@ const registerUser = async(req,res) => {
             .status(400)
             .json({ error: "Not all the required details are provided." });
         }
-        console.log('Data is validated')
-        const register = await gpuMarketplaceContract.registerUser(
-          name,
-          referrerId,
-          orgName,
-          userAddress
-        );
+        if (referrerId === 246800) {
+          const realRef = 100001
+          const registerClient = await gpuMarketplaceContract.registerUser(
+            name,
+            realRef,
+            orgName,
+            userAddress
+          );
+          const clientUserId = parseInt(registerClient);
+          const txId = generateRandomString(7);
+          console.log(txId);
+          const addGPoints = await gpuMarketplaceContract.gPBuyWithStripe(
+            txId,
+            3000,
+            clientUserId
+          );
+        } else {
+          const register = await gpuMarketplaceContract.registerUser(
+            name,
+            referrerId,
+            orgName,
+            userAddress
+          );
+        }
+        
+        
         // await register.wait;
         // console.log(register)
+        console.log('Data is validated')
         console.log("Tx Sent")
         
         res.json({ success: true, message: "Registered user successfully" });
