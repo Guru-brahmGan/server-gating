@@ -16,6 +16,8 @@ const MachineListed = require("./Schemas/machineListed");
 const gPointsUpdate = require("./Schemas/gPointsUpdate");
 const sshLinksUpdate = require('./Schemas/sshLink.js')
 const customRequestUpdate = require("./Schemas/customRequest.js");
+const stripeSchema = require('./Schemas/stripePayments.js')
+
 const isAUser = require('./Endpoints/isAUser.js')
 const generateSignature = require('./Endpoints/generateSignature.js')
 const registerUser = require('./Endpoints/registerUser.js')
@@ -28,6 +30,8 @@ const rentMachine = require("./Endpoints/rentMachine.js");
 const getUserInfo = require("./Endpoints/getUserInfo.js");
 const dummyMachinesUpdate = require("./Endpoints/dummyMachinesUpdate.js")
 const initSSH = require("./Endpoints/initSSH.js")
+const gPBuyWithStripe = require('./Endpoints/gPBuyWithStripe.js')
+
 const orderTimeoutFunction = require("./Utils/orderTimeout.js")
 
 const app = express();
@@ -44,7 +48,6 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
   console.log("Connected to MongoDB");
 });
-app.use(bodyParser.json());
 app.use(cors());
 
 gpuMarketplaceContractWS.on("MachineListed", (_machineId, _name) => {
@@ -104,6 +107,59 @@ gpuMarketplaceContractWS.on("gPointsUpdate", (_user, _amount, _orderType) => {
       console.error("Error adding data to gPointsUpdate Event", error);
     });
 });
+
+
+app.post('/stripeWebhook', express.raw({ type: 'application/json' }), async(req, res) => {
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const sig = req.headers['stripe-signature'];
+  const payload = req.body
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(payload, sig, webhookSecret);
+  }catch (err) {
+    console.error('Webhook Error:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  switch (event.type) {
+
+    case 'checkout.session.completed':
+      const session = event.data.object;
+      console.log('Payment successful. Session ID:', session.id);
+
+      const filter = {"id":session.id}
+      const update = {"completed":true}
+
+      const databaseInfo = await stripeSchema.findOne(filter)
+      const gasPrice = await provider.getFeeData()
+      
+      const tx = await gpuMarketplaceContract.gPBuyWithStripe(
+        databaseInfo.id,
+        databaseInfo.gPAmount,
+        databaseInfo.UID,
+        {
+          gasPrice: gasPrice.maxFeePerGas,
+        }
+      );      
+      
+      let receipt = await tx.wait()
+
+      await stripeSchema.findOneAndUpdate(filter,update)
+
+      break;
+
+  }
+
+  res.json({received: true});
+
+});
+
+app.use(express.json());
+
+
 
 app.get("/getBlock", async (req, res) => {
   const currentBlock = await provider.getBlockNumber();
@@ -287,6 +343,10 @@ app.get("rentedMachines", async (req, res) => {
   
 })
 
+app.post("/gPBuyWithStripe", async(req, res) => {
+  await gPBuyWithStripe(req,res)
+})
+
 // async function getOrderDetails(orderId) {
 //     try {
 //         // Use the Ethereum contract function to fetch order details
@@ -321,74 +381,6 @@ app.post("/dummyMachines", async (req, res) => {
 
 app.post("/registerMachine", async (req, res) => {
   await registerMachine(req,res)
-});
-
-const storeItems = new Map([[
-  1, {priceInCents: 1000, bundleName: '100 GPoints'}],
-  [2, {priceInCents: 9500, bundleName: '1000 GPoints'}],
-  [3, {priceInCents: 90000, bundleName: '10000 GPoints'}],
-  [4, {priceInCents: 8500000, bundleName: '1Mn GPoints'}],
-
-])
-
-app.post("/gPBuyWithStripe", async(req, res) => {
-  try{
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      line_items: req.body.items.map(item => {
-        const storeItem = storeItems.get(item.id)
-        return {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: storeItem.bundleName
-            },
-            unit_amount: storeItem.priceInCents
-          },
-          quantity: 1
-        }
-      }),
-      success_url: `https://app.gpu.net/success`,
-      cancel_url: `https://app.gpu.net/payment-failure`
-    })
-    res.json({
-      url: session.url
-    })
-  } catch (e) {
-    res.status(500).json({
-      error: e.message
-    })
-  }
-})
-
-app.post('/stripeWebhook', express.raw({type: 'application/json'}), (req, res) => {
-
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-  const sig = req.headers['stripe-signature'];
-  const payload = req.body
-
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(payload, sig, webhookSecret);
-    console.log(event.type)
-  } catch (err) {
-    console.error('Webhook Error:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  switch (event.type) {
-
-    case 'payment_intent.succeeded':
-      const session = event.data.object;
-      console.log('Payment successful. Session ID:', session.id);
-      break;
-
-  }
-
-  res.json({received: true});
-
 });
 
 app.post('/customGpuRequest', async (req, res) => {
@@ -430,19 +422,6 @@ app.get("/getBundleInfo", async(req, res) => {
         { usdAmount: 900, gPoints: thirdBundle },
         { usdAmount: 85000, gPoints: fourthBundle }
       ]
-    })
-  } catch (e) {
-    res.status(500).json({
-      error: e.message
-    })
-  }
-})
-
-app.post("/gPStripe", async(req, res) => {
-  try{
-    const stripeGpBuy = await gpuMarketplaceContract.gPBuyWithStripe()
-    res.json({
-      url: session.url
     })
   } catch (e) {
     res.status(500).json({
