@@ -22,7 +22,7 @@ const registerMachine = async(req,res) => {
           .json({ error: "Wallet address is not a registered user." });
       }
   
-      const tx = await gpuMarketplaceContract.registerMachines(
+      const tx = parseInt(await gpuMarketplaceContract.registerMachines(
         machineData.cpuname,
         machineData.gpuname,
         machineData.spuVRam,
@@ -34,7 +34,7 @@ const registerMachine = async(req,res) => {
         machineData.region,
         machineData.bidprice,
         machineData.walletAddress
-      );
+      ));
   
       const receipt = await tx.wait();
   
