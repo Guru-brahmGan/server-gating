@@ -4,6 +4,7 @@ const cors = require("cors");
 const axios = require("axios");
 require('dotenv').config()
 const stripe = require("stripe")(`${process.env.STRIPE_PRIVATE_KEY}`);
+const bodyParser = require("body-parser");
 
 const {gpuMarketplaceContractInstance, gpuMarketplaceContractWSInstance} = require('./Contract/contract.js')
 const {provider} = gpuMarketplaceContractInstance()
