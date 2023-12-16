@@ -177,12 +177,14 @@ app.get("/healthCheck", async(req,res)=>{
 app.post("/generateSignature", async (req, res) => {
   await generateSignature(req,res)
 });
+
 app.post('/getOrderId', async (req, res) => {
   const maxOrderId = parseInt(await gpuMarketplaceContract.orderId());
   res.json({
     orderId: maxOrderId
   })
 })
+
 app.post('/get_ssh', async (req, res) => {
   try {
       const orderId  = req.body.orderId;
@@ -215,13 +217,7 @@ app.post("/verifyTweet", async(req, res) => {
     res.json({ success: true, message: "Verified successfully" });
   } catch (e) {
     console.error("Error registering user:", e);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to register user",
-        error: e.message,
-      });
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
 
@@ -405,7 +401,7 @@ app.post('/customGpuRequest', async (req, res) => {
           data: newCustomRequest
       });
   } catch (error) {
-      res.status(500).json({ message: 'Error submitting custom GPU request', error: error.message });
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
 
@@ -424,9 +420,7 @@ app.get("/getBundleInfo", async(req, res) => {
       ]
     })
   } catch (e) {
-    res.status(500).json({
-      error: e.message
-    })
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 })
 
@@ -447,7 +441,7 @@ app.post('/getOrderSSH', async (req, res) => {
       res.json(sshLinkEntry);
   } catch (error) {
       console.error('Error fetching SSH link:', error);
-      res.status(500).json({ message: 'Internal Server Error', error: error.message });
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
 
@@ -461,9 +455,7 @@ app.post("/getMachinesOwned", async(req, res) => {
       bundles : parsedGpuList
     })
   } catch (e) {
-    res.status(500).json({
-      error: e.message
-    })
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 })
 
