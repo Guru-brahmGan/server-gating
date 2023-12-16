@@ -61,13 +61,7 @@ const rentMachine = async(req,res) => {
         // }, timeoutInMilliseconds);
       } catch (error) {
         console.error("Error renting a machine:", error);
-        res
-          .status(500)
-          .json({
-            success: false,
-            message: "Failed to rent the machine",
-            error: error.message,
-          });
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
       }
 
 }

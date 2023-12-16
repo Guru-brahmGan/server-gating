@@ -54,8 +54,6 @@ const gPBuyWithStripe = async(req,res) => {
         let loopCount = 0;
         let userId = 101;
     
-        let registeredWallets = [];
-        let walletGpoints = [];
         let userContractCall = [];
     
         while (loopCount < totalUsers) {
@@ -90,9 +88,7 @@ const gPBuyWithStripe = async(req,res) => {
         })
       } catch (e) {
         console.log(e)
-        res.status(500).json({
-          error: e.message
-        })
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
       }
 
 }

@@ -43,7 +43,7 @@ const userOrders = async(req,res) => {
         })
     } catch (e) {
         console.log(e);
-        res.json({ success: false, message: "Something went wrong." });
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 
 }
