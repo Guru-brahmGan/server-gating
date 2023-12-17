@@ -1,14 +1,46 @@
 const stripe = require("stripe")(`${process.env.STRIPE_PRIVATE_KEY}`);
-const {gpuMarketplaceContractInstance} = require('..//Contract/contract.js')
+const {gpuMarketplaceContractInstance} = require('../contract/contract.js')
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
-const stripeSchema = require("../Schemas/stripePayments.js")
+const { ethers } = require("ethers");
 
-const storeItems = new Map([
+const stripeSchema = require("../models/stripePayments.js")
+const customRequestUpdate = require("../models/customRequest.js");
+const sshLinksUpdate = require('../models/sshLink.js')
+
+const storeItems = new Map(
+    [
     [1, {priceInCents: 1000, bundleName: '100 GPoints',gPAmount:100}],
     [2, {priceInCents: 9500, bundleName: '1000 GPoints',gPAmount:1000}],
     [3, {priceInCents: 90000, bundleName: '10000 GPoints',gPAmount:10000}],
     [4, {priceInCents: 8500000, bundleName: '1Mn GPoints',gPAmount:1000000}],
-])
+    ]
+)
+
+const generateSignature = async(req ,res) => {
+
+  // Extract the wallet address from the request body
+  const walletAddress = req.body.walletAddress;
+
+  // Check if the wallet address is provided
+  if (!walletAddress) {
+    return res.status(400).json({ error: "Wallet address is required." });
+  }
+
+  // Generate the message to be signed: wallet address + current timestamp
+  const message = `${walletAddress}:${Date.now()}`;
+
+  // Calculate message hash
+  const mesHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(message));
+
+  // Sign the message hash
+  const sigHash = await wallet.signMessage(ethers.utils.arrayify(mesHash));
+
+  return res.json({
+    mesHash: mesHash,
+    sigHash: sigHash,
+  });
+    
+}
 
 const gPBuyWithStripe = async(req,res) => {
 
@@ -93,4 +125,67 @@ const gPBuyWithStripe = async(req,res) => {
 
 }
 
-module.exports = gPBuyWithStripe
+const customGpuRequest = async(req, res) => {
+  
+    try {
+
+      const username = req.body.username;  
+      const GPUname = req.body.GPUname;
+      const Quantity = req.body.Quantity;
+  
+        // Create a new custom request
+        const newCustomRequest = new customRequestUpdate({
+          username,
+          GPUname,
+          Quantity
+        });
+  
+        // Save the request to the database
+        await newCustomRequest.save();
+  
+        // Send a response back to the client
+        res.status(201).json({
+            message: 'Custom GPU request submitted successfully',
+            data: newCustomRequest
+        });
+
+    }catch(error) {
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+}
+
+const getOrderSSH = async(req, res) => {
+
+    try {
+  
+      const orderId  = req.body.orderId;
+  
+        if (!orderId) {
+            return res.status(400).json({ message: 'orderId is required' });
+        }
+  
+        const sshLinkEntry = await sshLinksUpdate.findOne({ orderId: orderId });
+  
+        if (!sshLinkEntry) {
+            return res.status(404).json({ message: 'SSH link not found for the given orderId' });
+        }
+  
+
+        res.json({
+            success: true,
+            sshLink: sshLinkEntry.sshLink
+        });
+
+      } catch (error) {
+        console.error('Error fetching SSH link:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+}
+
+
+module.exports = {
+    generateSignature,
+    gPBuyWithStripe,
+    customGpuRequest,
+    getOrderSSH
+}

@@ -1,5 +1,5 @@
-const {gpuMarketplaceContractInstance} = require('../Contract/contract.js')
-const orderTimeoutUpdate = require("../Schemas/orderTimeout.js")
+const {gpuMarketplaceContractInstance} = require('../contract/contract.js')
+const orderTimeoutUpdate = require("../models/orderTimeout.js")
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 
 const orderTimeoutFunction = async() => {
@@ -28,7 +28,5 @@ const orderTimeoutFunction = async() => {
         }
 
 }
-
-setInterval(orderTimeoutFunction, 10 * 1000);
 
 module.exports = orderTimeoutFunction
