@@ -2,7 +2,7 @@
 
 ## Overview
 
-The GPU.net Node.js server is a crucial component of the GPU.net ecosystem, providing a backend interface for interacting with the Ethereum blockchain, handling user transactions, managing database operations, and processing external API requests. This documentation outlines the server's architecture, key functionalities, and setup instructions.
+The GPU.net Node.js server is a crucial component of the GPU.net ecosystem, providing a backend interface for interacting with the Ethereum blockchain, handling user transactions, managing database operations, and processing external API requests. 
 
 ## Architecture
 
@@ -66,19 +66,15 @@ The server provides various endpoints under the `/api` path. Each endpoint serve
 - **POST `/api/other/stripeWebhook`**: Handles Stripe webhook events.
 - **GET `/api/machines/available`**: Retrieves available machines for rent.
 - **POST `/api/users/register`**: Registers a new user.
-- ... _[additional endpoints as per your implementation]_
+- ... _[additional endpoints)
 
 ## Security and Best Practices
 
-- Implement HTTPS for secure communication.
-- Use input validation and rate limiting to prevent abuse.
+- HTTPS for secure communication.
+-  input validation and rate limiting to prevent abuse.
 - Regularly update dependencies to patch vulnerabilities.
-- Monitor server performance and set up alerting for downtime or errors.
+- Monitoring server performance and set up alerting for downtime or errors.
 
-## Testing
-
-- Write unit and integration tests for API endpoints.
-- Use tools like Postman or Swagger for API testing and documentation.
 
 ## Conclusion
 
