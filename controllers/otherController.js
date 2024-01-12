@@ -1,11 +1,14 @@
 const stripe = require("stripe")(`${process.env.STRIPE_PRIVATE_KEY}`);
-const {gpuMarketplaceContractInstance} = require('../contract/contract.js')
+const {gpuMarketplaceContractInstance} = require('../Contract/contract.js')
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 const { ethers } = require("ethers");
 
 const stripeSchema = require("../models/stripePayments.js")
 const customRequestUpdate = require("../models/customRequest.js");
 const sshLinksUpdate = require('../models/sshLink.js')
+const AvailableMachine = require('../models/AvailableMachine');
+const PreBookedMachine = require('../models/PreBookedMachine');
+const { use } = require("../routes/infoRoutes.js");
 
 const storeItems = new Map(
     [
@@ -154,32 +157,63 @@ const customGpuRequest = async(req, res) => {
     }
 }
 
+const preBook = async(req,res) => {
+  try {
+    const { username, machineId, duration } = req.body;
+    console.log("Got the request")
+    if (!username || !machineId || !duration) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const newPreBookedMachine = new PreBookedMachine({ username, machineId, duration });
+
+  
+    await newPreBookedMachine.save();
+    res.status(201).json({ message: 'Machine pre-booked successfully' });
+  }
+  catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// Endpoint to get machines available for pre-booking
+const availableToPreBook = async(req,res) => {
+  try{
+    const machines = await AvailableMachine.find({});
+    res.json(machines);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 const getOrderSSH = async(req, res) => {
 
-    try {
-  
-      const orderId  = req.body.orderId;
-  
-        if (!orderId) {
-            return res.status(400).json({ message: 'orderId is required' });
-        }
-  
-        const sshLinkEntry = await sshLinksUpdate.findOne({ orderId: orderId });
-  
-        if (!sshLinkEntry) {
-            return res.status(404).json({ message: 'SSH link not found for the given orderId' });
-        }
-  
+  try {
 
-        res.json({
-            success: true,
-            sshLink: sshLinkEntry.sshLink
-        });
+    const orderId  = req.body.orderId;
 
-      } catch (error) {
-        console.error('Error fetching SSH link:', error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
-    }
+      if (!orderId) {
+          return res.status(400).json({ message: 'orderId is required' });
+      }
+
+      const sshLinkEntry = await sshLinksUpdate.findOne({ orderId: orderId });
+
+      if (!sshLinkEntry) {
+          return res.status(404).json({ message: 'SSH link not found for the given orderId' });
+      }
+
+
+      res.json({
+          success: true,
+          sshLink: sshLinkEntry.sshLink
+      });
+
+  } catch (error) {
+      console.error('Error fetching SSH link:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
 }
 
 
@@ -187,5 +221,7 @@ module.exports = {
     generateSignature,
     gPBuyWithStripe,
     customGpuRequest,
-    getOrderSSH
+    getOrderSSH,
+    preBook,
+    availableToPreBook
 }
