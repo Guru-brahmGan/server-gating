@@ -11,15 +11,16 @@ const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 
 const stripeSchema = require("./models/stripePayments.js")
 
-const orderTimeoutFunction = require('./utils/orderTimeout.js')
-const databaseConnection = require('./utils/databaseInit.js');
-const eventLogs = require('./utils/eventLogs.js')
+const orderTimeoutFunction = require('./Utils/orderTimeout.js')
+const databaseConnection = require('./Utils/databaseInit.js');
+const eventLogs = require('./Utils/eventLogs.js')
 
 const serverRoutes = require('./routes');
 
 const app = express();
 const port = 3000;
-app.use(express.json());
+app.use(cors());
+app.use(bodyParser.json());
 app.use("/api", serverRoutes);
 
 app.use((_, res) =>{

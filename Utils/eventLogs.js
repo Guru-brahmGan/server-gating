@@ -1,4 +1,4 @@
-const {gpuMarketplaceContractWSInstance} = require('../contract/contract.js')
+const {gpuMarketplaceContractWSInstance} = require('../Contract/contract.js')
 const {gpuMarketplaceContractWS} = gpuMarketplaceContractWSInstance()
 
 const MachineRented = require('../models/machineRented.js');
