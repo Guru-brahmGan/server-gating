@@ -1,5 +1,5 @@
 const axios = require("axios");
-const {gpuMarketplaceContractInstance} = require('../contract/contract.js')
+const {gpuMarketplaceContractInstance} = require('../Contract/contract.js')
 const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
 const {provider} = gpuMarketplaceContractInstance()
 
