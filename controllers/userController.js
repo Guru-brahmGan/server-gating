@@ -35,7 +35,7 @@ const register = async(req,res) => {
         const userAddress = req.body.userAddress;
     
         // Check if the everything is provided
-        if (!name && !referrerId && !orgName && !userAddress) {
+        if (!name || !referrerId || !orgName || !userAddress) {
           return res
             .status(400)
             .json({ error: "Not all the required details are provided." });
