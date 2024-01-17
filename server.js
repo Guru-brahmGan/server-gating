@@ -20,15 +20,6 @@ const serverRoutes = require('./routes');
 const app = express();
 const port = 3000;
 app.use(cors());
-app.use(bodyParser.json());
-app.use("/api", serverRoutes);
-
-app.use((_, res) =>{
-    res.send({
-        message: 'Not found!'
-    })
-});
-app.use(cors());
 
 app.post('/api/other/stripeWebhook', express.raw({ type: 'application/json' }), async(req, res) => {
 
@@ -77,6 +68,18 @@ app.post('/api/other/stripeWebhook', express.raw({ type: 'application/json' }), 
   res.json({received: true});
 
 });
+
+app.use(bodyParser.json());
+app.use("/api", serverRoutes);
+
+app.use((_, res) =>{
+    res.send({
+        message: 'Not found!'
+    })
+});
+app.use(cors());
+
+
 
 databaseConnection()
 eventLogs()
