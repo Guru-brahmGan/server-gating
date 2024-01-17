@@ -1,5 +1,5 @@
 const {gpuMarketplaceContractInstance} = require('../Contract/contract.js')
-const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
+const {gpuMarketplaceContract , provider} = gpuMarketplaceContractInstance()
 
 const txIdUsed = require('../models/txIdUsed.js')
 const Order = require('../models/order.js')
@@ -35,18 +35,24 @@ const register = async(req,res) => {
         const userAddress = req.body.userAddress;
     
         // Check if the everything is provided
-        if (!name && !referrerId && !signature && !messageHash && !userAddress) {
+        if (!name && !referrerId && !orgName && !userAddress) {
           return res
             .status(400)
             .json({ error: "Not all the required details are provided." });
         }
+
+        const gasPrice = await provider.getFeeData()
+
         if (referrerId === 246800) {
           const realRef = 100001
           const registerClient = await gpuMarketplaceContract.registerUser(
             name,
             realRef,
             orgName,
-            userAddress
+            userAddress,
+            {
+              gasPrice: gasPrice.maxFeePerGas,
+            }
           );
           const clientUserId = parseInt(registerClient);
           const txId = generateRandomString(7);
@@ -54,7 +60,10 @@ const register = async(req,res) => {
           const addGPoints = await gpuMarketplaceContract.gPBuyWithStripe(
             txId,
             1000,
-            clientUserId
+            clientUserId,
+            {
+              gasPrice: gasPrice.maxFeePerGas,
+            }
           );
           const savedTx = new txIdUsed({
             txId
@@ -65,7 +74,10 @@ const register = async(req,res) => {
             name,
             referrerId,
             orgName,
-            userAddress
+            userAddress,
+            {
+              gasPrice: gasPrice.maxFeePerGas,
+            }
           );
           nonClientUserId = parseInt(register);
         }
@@ -261,8 +273,9 @@ const dashboardAnalytics = async(req,res) => {
 const verifyTweet =  async(req, res) => {
 
     const userAddress = req.body.userAddress;
+    const gasPrice = await provider.getFeeData()
     try {
-      const tweeted = await gpuMarketplaceContract.verifyTweet(userAddress);
+      const tweeted = await gpuMarketplaceContract.verifyTweet(userAddress,{gasPrice: gasPrice.maxFeePerGas});
       res.json({ success: true, message: "Verified successfully" });
     } catch (e) {
       console.error("Error registering user:", e);

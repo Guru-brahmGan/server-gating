@@ -1,7 +1,6 @@
 const axios = require("axios");
 const {gpuMarketplaceContractInstance} = require('../Contract/contract.js')
-const {gpuMarketplaceContract} = gpuMarketplaceContractInstance()
-const {provider} = gpuMarketplaceContractInstance()
+const {gpuMarketplaceContract, provider} = gpuMarketplaceContractInstance()
 
 const DummyMachines = require('../models/dummyMachines.js')
 const Order = require('../models/order.js')
@@ -111,12 +110,16 @@ const rent = async(req,res) => {
         const machineId = req.body.machineId;
         const rentalDuration = req.body.rentalDuration;
         const userId = req.body.userId;
+        const gasPrice = await provider.getFeeData()
     
         // Call the rentMachine function in smart contract and get the orderId
         const order = await gpuMarketplaceContract.rentMachine(
           machineId,
           rentalDuration,
-          userId
+          userId,
+          {
+            gasPrice: gasPrice.maxFeePerGas,
+          }
         );
 
         const currentTime = Math.floor(Date.now() / 1000);
@@ -186,7 +189,9 @@ const register = async(req,res) => {
           .status(400)
           .json({ error: "Wallet address is not a registered user." });
       }
-  
+      
+      const gasPrice = await provider.getFeeData()
+
       const tx = parseInt(await gpuMarketplaceContract.registerMachines(
         machineData.cpuname,
         machineData.gpuname,
@@ -198,7 +203,10 @@ const register = async(req,res) => {
         machineData.openedPorts,
         machineData.region,
         machineData.bidprice,
-        machineData.walletAddress
+        machineData.walletAddress,
+        {
+          gasPrice: gasPrice.maxFeePerGas,
+        }
       ));
   
       const receipt = await tx.wait();
@@ -328,7 +336,8 @@ const setBidPrice = async (req, res) => {
 
       const machineId = req.body.machineId;
       const newBidPrie = req.body.bidAmount;
-      const setBid = await gpuMarketplaceContract.setBidPrice(machineId, newBidPrie);
+      const gasPrice = await provider.getFeeData()
+      const setBid = await gpuMarketplaceContract.setBidPrice(machineId, newBidPrie,{gasPrice: gasPrice.maxFeePerGas});
       
       res.json({
         message: "Bid Price is set successfully",
